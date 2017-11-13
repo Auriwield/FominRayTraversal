@@ -1,0 +1,38 @@
+{
+  "name": "fominraytraversal",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon ./bin/www",
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "browser-sync": "^2.18.13",
+    "express": "^4.15.5",
+    "gulp-browserify-typescript": "^1.0.1",
+    "gulp-debug": "^3.1.0",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-pug": "^3.3.0",
+    "gulp-rename": "^1.2.2",
+    "gulplog": "^1.0.0",
+    "minimatch": "^3.0.4",
+    "pug": "2.0.0-beta11",
+    "through2": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.2.16",
+    "browserify": "^14.5.0",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-notify": "^3.0.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-typescript": "^3.2.3",
+    "gulp-util": "^3.0.8",
+    "node-notifier": "^5.1.2",
+    "run-sequence": "^2.2.0",
+    "ts-loader": "^3.1.1",
+    "tsify": "^3.0.3",
+    "typescript": "^2.6.1",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.9.0"
+  }
+}

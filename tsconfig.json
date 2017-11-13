@@ -1,0 +1,20 @@
+{
+  "files": [
+    "src/ts/app.ts"
+  ],
+
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "module": "es6",
+    "lib": [
+      "dom",
+      "es5",
+      //"scripthost",
+      "es2015.iterable"
+    ],
+    "target": "es5",
+    "sourceMap": true,
+    "jsx": "react",
+    "allowJs": true
+  }
+}

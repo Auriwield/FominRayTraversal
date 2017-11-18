@@ -1,63 +1,60 @@
 'use strict';
 
 const gulp = require('gulp');
+const debouncy = require('debouncy');
 const pug = require('gulp-pug');
 
 const browserSync = require('browser-sync').create();
 const nodemon = require('gulp-nodemon');
 
-const notify = require('gulp-notify');
-const browserify = require('browserify');
-const source = require('vinyl-source-stream');
-const tsify = require('tsify');
+const notifier = require('node-notifier');
+const ts = require('gulp-typescript');
+const tsProject = ts.createProject('tsconfig.json', { noImplicitAny: true });
+const longReporter = ts.reporter.longReporter();
+
+const notifyFn = debouncy((err) => {
+    notifier.notify({ title: "Typescript error", message: err.message });
+}, 1000, true);
+const reporter = {
+    error: (error, ts) => {
+        notifyFn(error);
+        longReporter.error(error, ts);
+    },
+    finish: longReporter.finish
+};
 
 const serverPort = process.env.PORT || 8080;
+
 //const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
-gulp.task('css', function () {
+gulp.task('css', () => {
     return gulp.src('src/css/**/*.css', { since: gulp.lastRun('css') })
                .pipe(gulp.dest('dist/public/css'));
 });
 
-gulp.task('view', function () {
+gulp.task('view', () => {
     return gulp.src('src/views/index.pug')
                .pipe(pug())
                .pipe(gulp.dest('dist/public'));
 });
 
-gulp.task('typescript', function () {
-
-    let errorHandler = err => {
-        return {
-            title: err.name,
-            message: err.message
-        };
-    };
-
-    // noinspection JSUnresolvedFunction
-    return browserify({
-        basedir: '.',
-        debug: true,
-        entries: ['src/ts/app.ts'],
-        cache: {},
-        packageCache: {},
-    })
-        .plugin(tsify)
-        .bundle()
-        .on('error', notify.onError(errorHandler))
-        .pipe(source('bundle.js'))
-        .pipe(gulp.dest('dist/public/js'));
+gulp.task('typescript', () => {
+    return gulp.src('src/**/*.ts')
+               .pipe(tsProject(reporter))
+               .js
+               .pipe(gulp.dest('dist/public/js'));
 });
 
 gulp.task('build', gulp.parallel(['view', 'css', 'typescript']));
 
-gulp.task('watch', function () {
-    gulp.watch('src/css/**/*.css', gulp.series('css'));
-    gulp.watch('src/views/index.pug', gulp.series('view'));
-    gulp.watch('src/ts/**/*.ts', gulp.series('typescript'));
+gulp.task('watch', (done) => {
+    gulp.watch('src/css/**/*.css', { ignoreInitial: false }, gulp.series('css'));
+    gulp.watch('src/views/index.pug', { ignoreInitial: false }, gulp.series('view'));
+    gulp.watch('src/ts/**/*.ts', { ignoreInitial: false }, gulp.series('typescript'));
+    done();
 });
 
-gulp.task('serve', function () {
+gulp.task('serve', () => {
     browserSync.init(null, {
         proxy: `http://localhost:${serverPort}`,
         browser: 'google chrome',
@@ -66,7 +63,7 @@ gulp.task('serve', function () {
     browserSync.watch('dist/public/**/*.*', null).on('change', browserSync.reload);
 });
 
-gulp.task('nodemon', function (cb) {
+gulp.task('nodemon', (cb) => {
     let callbackCalled = false;
     return nodemon({
         script: './bin/www.js',
@@ -90,7 +87,8 @@ gulp.task('dev',
     gulp.series('build',
         gulp.parallel('watch',
             gulp.series('nodemon', 'serve')
-        )));
+        ))
+);
 
 gulp.task('default', gulp.series('dev'));
 

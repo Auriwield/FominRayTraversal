@@ -1,4 +1,7 @@
-import * as canvas from "./canvas"
+import * as $ from "jquery";
+import {Canvas} from "./canvas";
 
-class Man {
-}
+$(() => {
+    let canvas = new Canvas(600, 600);
+    canvas.init();
+});

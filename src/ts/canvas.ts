@@ -1,10 +1,18 @@
 import * as $ from "jquery";
 
-$(document).ready(() => {
-    let width = 600;
-    let height = 600;
+export class Canvas {
 
-    let canvas = $("#canvas");
-    canvas[0].setAttribute("width", `${width}px`);
-    canvas[0].setAttribute("height", `${height}px`);
-});
+    private width: number;
+    private height: number;
+
+    constructor(width: number, height: number) {
+
+    }
+
+    init() {
+        let canvas = $("#canvas");
+        canvas[0].setAttribute("width", `${this.width}px`);
+        canvas[0].setAttribute("height", `${this.height}px`);
+    }
+
+}

@@ -1,20 +1,16 @@
 {
-  "files": [
-    "src/ts/app.ts"
-  ],
-
   "compilerOptions": {
     "noImplicitAny": true,
-    "module": "es6",
+    "module": "es2015",
     "lib": [
       "dom",
       "es5",
-      //"scripthost",
+      "es6",
+      "scripthost",
       "es2015.iterable"
     ],
     "target": "es5",
     "sourceMap": true,
-    "jsx": "react",
     "allowJs": true
   }
 }

@@ -1,21 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
-var _jquery = require("jquery");
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _canvas = require("./canvas");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-(0, _jquery2.default)(function () {
-    var canvas = new _canvas.Canvas(600, 600);
-});
-
-},{"./canvas":2,"jquery":3}],2:[function(require,module,exports){
-"use strict";
-
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
@@ -43,16 +28,56 @@ var Canvas = exports.Canvas = function () {
     _createClass(Canvas, [{
         key: "init",
         value: function init() {
-            this.canvas = (0, _jquery2.default)("#canvas");
-            this.canvas[0].setAttribute("width", this.width + "px");
-            this.canvas[0].setAttribute("height", this.height + "px");
+            this.canvas = (0, _jquery2.default)("#canvas")[0];
+            this.ctx = this.canvas.getContext("2d");
+            this.canvas.setAttribute("width", this.width + "px");
+            this.canvas.setAttribute("height", this.height + "px");
+            this.clear();
+        }
+    }, {
+        key: "refresh",
+        value: function refresh() {
+            var _this = this;
+
+            this.clear();
+            this.elements.forEach(function (value) {
+                return value.draw(_this);
+            });
+        }
+    }, {
+        key: "clear",
+        value: function clear() {
+            this.fill("white");
+        }
+    }, {
+        key: "fill",
+        value: function fill(color) {
+            this.ctx.beginPath();
+            this.ctx.rect(0, 0, this.width, this.height);
+            this.ctx.fillStyle = color;
+            this.ctx.fill();
         }
     }]);
 
     return Canvas;
 }();
 
-},{"jquery":3}],3:[function(require,module,exports){
+},{"jquery":3}],2:[function(require,module,exports){
+"use strict";
+
+var _jquery = require("jquery");
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _Canvas = require("./Canvas");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+(0, _jquery2.default)(function () {
+    var canvas = new _Canvas.Canvas(600, 600);
+});
+
+},{"./Canvas":1,"jquery":3}],3:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -10307,4 +10332,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[1]);
+},{}]},{},[2]);

@@ -9,8 +9,9 @@
       "scripthost",
       "es2015.iterable"
     ],
-    "target": "es5",
+    "target": "es2015",
     "sourceMap": true,
-    "allowJs": true
+    "allowJs": true,
+    "allowSyntheticDefaultImports" : true
   }
 }

@@ -32,6 +32,7 @@ var Canvas = exports.Canvas = function () {
             this.ctx = this.canvas.getContext("2d");
             this.canvas.setAttribute("width", this.width + "px");
             this.canvas.setAttribute("height", this.height + "px");
+            this.elements = [];
             this.clear();
         }
     }, {
@@ -57,12 +58,88 @@ var Canvas = exports.Canvas = function () {
             this.ctx.fillStyle = color;
             this.ctx.fill();
         }
+    }, {
+        key: "addElement",
+        value: function addElement(element) {
+            this.elements.push(element);
+        }
+    }, {
+        key: "drawLine",
+        value: function drawLine(p1, p2, lineWidth, lineColor) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(p1.x, p1.y);
+            this.ctx.lineTo(p2.x, p2.y);
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.strokeStyle = lineColor;
+            this.ctx.stroke();
+        }
     }]);
 
     return Canvas;
 }();
 
-},{"jquery":3}],2:[function(require,module,exports){
+},{"jquery":5}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Line = exports.Line = function () {
+    function Line(p1, p2) {
+        var lineWidth = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+        var lineColor = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "black";
+
+        _classCallCheck(this, Line);
+
+        this.p1 = p1;
+        this.p2 = p2;
+        this.lineWidth = lineWidth;
+        this.lineColor = lineColor;
+    }
+
+    _createClass(Line, [{
+        key: "draw",
+        value: function draw(canvas) {
+            canvas.drawLine(this.p1, this.p2, this.lineWidth, this.lineColor);
+        }
+    }, {
+        key: "containsPoint",
+        value: function containsPoint(x, y) {
+            return false;
+        }
+    }, {
+        key: "onMouseHover",
+        value: function onMouseHover(x, y) {}
+    }, {
+        key: "onMouseClick",
+        value: function onMouseClick(x, y) {}
+    }]);
+
+    return Line;
+}();
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Point = exports.Point = function Point(x, y) {
+    _classCallCheck(this, Point);
+
+    this.x = x;
+    this.y = y;
+};
+
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var _jquery = require("jquery");
@@ -71,13 +148,19 @@ var _jquery2 = _interopRequireDefault(_jquery);
 
 var _Canvas = require("./Canvas");
 
+var _Line = require("./Line");
+
+var _Point = require("./Point");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (0, _jquery2.default)(function () {
     var canvas = new _Canvas.Canvas(600, 600);
+    canvas.addElement(new _Line.Line(new _Point.Point(0, 0), new _Point.Point(600, 600)));
+    canvas.refresh();
 });
 
-},{"./Canvas":1,"jquery":3}],3:[function(require,module,exports){
+},{"./Canvas":1,"./Line":2,"./Point":3,"jquery":5}],5:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -10332,4 +10415,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[2]);
+},{}]},{},[4]);

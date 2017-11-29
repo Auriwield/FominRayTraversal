@@ -1,28 +1,36 @@
 import $ from "jquery";
-import {GraphicElement} from "./GraphicElement";
-import {Point} from "./Point";
+import {GraphicElement} from "./primitives/GraphicElement";
+import {ListenerDelegate} from "./listeners/ListenerDelegate";
+import {Listener} from "./listeners/Listener";
 
 export class Canvas {
 
-    private width: number;
-    private height: number;
+    private _width: number;
+    private _height: number;
     private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D;
     private elements: Array<GraphicElement>;
+    private listenerDelegate: ListenerDelegate;
+
+    ctx: CanvasRenderingContext2D;
 
     constructor(width: number, height: number) {
-        this.width = width;
-        this.height = height;
+        this._width = width;
+        this._height = height;
         this.init();
     }
 
     private init() {
         this.canvas = <HTMLCanvasElement> $("#canvas")[0];
         this.ctx = this.canvas.getContext("2d");
-        this.canvas.setAttribute("width", `${this.width}px`);
-        this.canvas.setAttribute("height", `${this.height}px`);
+        this.listenerDelegate = new ListenerDelegate(this.canvas, this);
+        this.canvas.setAttribute("width", `${this._width}px`);
+        this.canvas.setAttribute("height", `${this._height}px`);
         this.elements = [];
         this.clear();
+    }
+
+    private drawGrid() {
+
     }
 
     refresh() {
@@ -31,26 +39,33 @@ export class Canvas {
     }
 
     clear() {
-        this.fill("white")
+        this.fill("white");
+        this.drawGrid();
     }
 
     fill(color: string | CanvasGradient | CanvasPattern) {
         this.ctx.beginPath();
-        this.ctx.rect(0, 0, this.width, this.height);
+        this.ctx.rect(0, 0, this._width, this._height);
         this.ctx.fillStyle = color;
         this.ctx.fill();
     }
 
-    addElement(element: GraphicElement) {
-        this.elements.push(element);
+    addElement(...elements: GraphicElement[]) {
+        this.elements = this.elements.concat(elements);
+
+        let listeners : Array<Listener> = [];
+        elements.forEach(element => {
+            listeners = listeners.concat(element.listeners());
+        });
+
+        this.listenerDelegate.addListeners(listeners);
     }
 
-    drawLine(p1: Point, p2: Point, lineWidth: number, lineColor: string) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(p1.x, p1.y);
-        this.ctx.lineTo(p2.x, p2.y);
-        this.ctx.lineWidth = lineWidth;
-        this.ctx.strokeStyle = lineColor;
-        this.ctx.stroke();
+    get width(): number {
+        return this._width;
+    }
+
+    get height(): number {
+        return this._height;
     }
 }

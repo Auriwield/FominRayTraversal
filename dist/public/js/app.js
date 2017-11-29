@@ -12,6 +12,8 @@ var _jquery = require("jquery");
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
+var _ListenerDelegate = require("./listeners/ListenerDelegate");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -20,8 +22,8 @@ var Canvas = exports.Canvas = function () {
     function Canvas(width, height) {
         _classCallCheck(this, Canvas);
 
-        this.width = width;
-        this.height = height;
+        this._width = width;
+        this._height = height;
         this.init();
     }
 
@@ -30,11 +32,15 @@ var Canvas = exports.Canvas = function () {
         value: function init() {
             this.canvas = (0, _jquery2.default)("#canvas")[0];
             this.ctx = this.canvas.getContext("2d");
-            this.canvas.setAttribute("width", this.width + "px");
-            this.canvas.setAttribute("height", this.height + "px");
+            this.listenerDelegate = new _ListenerDelegate.ListenerDelegate(this.canvas, this);
+            this.canvas.setAttribute("width", this._width + "px");
+            this.canvas.setAttribute("height", this._height + "px");
             this.elements = [];
             this.clear();
         }
+    }, {
+        key: "drawGrid",
+        value: function drawGrid() {}
     }, {
         key: "refresh",
         value: function refresh() {
@@ -49,36 +55,375 @@ var Canvas = exports.Canvas = function () {
         key: "clear",
         value: function clear() {
             this.fill("white");
+            this.drawGrid();
         }
     }, {
         key: "fill",
         value: function fill(color) {
             this.ctx.beginPath();
-            this.ctx.rect(0, 0, this.width, this.height);
+            this.ctx.rect(0, 0, this._width, this._height);
             this.ctx.fillStyle = color;
             this.ctx.fill();
         }
     }, {
         key: "addElement",
-        value: function addElement(element) {
-            this.elements.push(element);
+        value: function addElement() {
+            for (var _len = arguments.length, elements = Array(_len), _key = 0; _key < _len; _key++) {
+                elements[_key] = arguments[_key];
+            }
+
+            this.elements = this.elements.concat(elements);
+            var listeners = [];
+            elements.forEach(function (element) {
+                listeners = listeners.concat(element.listeners());
+            });
+            this.listenerDelegate.addListeners(listeners);
         }
     }, {
-        key: "drawLine",
-        value: function drawLine(p1, p2, lineWidth, lineColor) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(p1.x, p1.y);
-            this.ctx.lineTo(p2.x, p2.y);
-            this.ctx.lineWidth = lineWidth;
-            this.ctx.strokeStyle = lineColor;
-            this.ctx.stroke();
+        key: "width",
+        get: function get() {
+            return this._width;
+        }
+    }, {
+        key: "height",
+        get: function get() {
+            return this._height;
         }
     }]);
 
     return Canvas;
 }();
 
-},{"jquery":5}],2:[function(require,module,exports){
+},{"./listeners/ListenerDelegate":4,"jquery":9}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.MovableLine = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Circle = require("./primitives/Circle");
+
+var _Point = require("./primitives/Point");
+
+var _OnDragListener = require("./listeners/OnDragListener");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MovableLine = exports.MovableLine = function () {
+    function MovableLine(line) {
+        _classCallCheck(this, MovableLine);
+
+        this.line = line;
+        this.leftEdge = new _Circle.Circle(line.left, 5);
+        this.rightEdge = new _Circle.Circle(line.right, 5);
+    }
+
+    _createClass(MovableLine, [{
+        key: "draw",
+        value: function draw(canvas) {
+            this.line.draw(canvas);
+            this.leftEdge.draw(canvas);
+            this.rightEdge.draw(canvas);
+        }
+    }, {
+        key: "containsPoint",
+        value: function containsPoint(point) {
+            return false;
+        }
+    }, {
+        key: "listeners",
+        value: function listeners() {
+            var _this = this;
+
+            var onDragLeftListener = new _OnDragListener.OnDragListener(this.leftEdge, function (event, canvas) {
+                _this.leftEdge.center = event.point;
+                _this.checkPoint(_this.leftEdge.center, new _Point.Point(0, 0), canvas.width, canvas.height);
+                canvas.refresh();
+            });
+            var onDragRightListener = new _OnDragListener.OnDragListener(this.rightEdge, function (event, canvas) {
+                _this.rightEdge.center = event.point;
+                _this.checkPoint(_this.rightEdge.center, new _Point.Point(0, 0), canvas.width, canvas.height);
+                canvas.refresh();
+            });
+            return onDragLeftListener.listen().concat(onDragRightListener.listen());
+        }
+        // checks if point p in specified rectangle
+        // p1 - left top corner
+
+    }, {
+        key: "checkPoint",
+        value: function checkPoint(p, p1, width, height) {
+            var p2 = new _Point.Point(p1.x + width, p1.y + height);
+            if (p.x < p1.x) p.x = p1.x;
+            if (p.y < p1.y) p.y = p1.y;
+            if (p.x > p2.x) p.x = p2.x;
+            if (p.y > p2.y) p.y = p2.y;
+        }
+    }]);
+
+    return MovableLine;
+}();
+
+},{"./listeners/OnDragListener":5,"./primitives/Circle":6,"./primitives/Point":8}],3:[function(require,module,exports){
+"use strict";
+
+var _jquery = require("jquery");
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _Canvas = require("./Canvas");
+
+var _Line = require("./primitives/Line");
+
+var _Point = require("./primitives/Point");
+
+var _MovableLine = require("./MovableLine");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+(0, _jquery2.default)(function () {
+    var canvas = new _Canvas.Canvas(600, 600);
+    var leftPoint = new _Point.Point(100, 100);
+    var rightPoint = new _Point.Point(500, 500);
+    var line = new _Line.Line(leftPoint, rightPoint);
+    canvas.addElement(new _MovableLine.MovableLine(line));
+    canvas.refresh();
+});
+
+},{"./Canvas":1,"./MovableLine":2,"./primitives/Line":7,"./primitives/Point":8,"jquery":9}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.ListenerDelegate = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Point = require("../primitives/Point");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ListenerDelegate = exports.ListenerDelegate = function () {
+    function ListenerDelegate(element, canvas) {
+        _classCallCheck(this, ListenerDelegate);
+
+        this.listeners = [];
+        this.canvas = canvas;
+        this.element = element;
+        this.registeredEvents = [];
+    }
+
+    _createClass(ListenerDelegate, [{
+        key: "addListeners",
+        value: function addListeners(listeners) {
+            this.listeners = this.listeners.concat(listeners);
+            this.registerEvents(listeners);
+        }
+    }, {
+        key: "registerEvents",
+        value: function registerEvents(listeners) {
+            var _this = this;
+
+            listeners.forEach(function (value) {
+                if (!value || !value.name || _this.registeredEvents.indexOf(value.name) !== -1) {
+                    console.log("drop " + value.name);
+                    return;
+                }
+                var element = value.element instanceof HTMLElement ? value.element : _this.element;
+                element.addEventListener(value.name, function (evt) {
+                    var listeners = _this.getListenersByEvent(value.name);
+                    if (!listeners || listeners.length == 0) {
+                        _this.element.removeEventListener(value.name, null, false);
+                    }
+                    listeners.forEach(function (listener) {
+                        var event = {
+                            point: _this.getPointFromEvent(evt),
+                            data: evt
+                        };
+                        listener.onAction(event, _this.canvas);
+                    });
+                });
+                _this.registeredEvents.push(value.name);
+            });
+        }
+    }, {
+        key: "getPointFromEvent",
+        value: function getPointFromEvent(e) {
+            var x = void 0;
+            var y = void 0;
+            if (e.pageX || e.pageY) {
+                x = e.pageX;
+                y = e.pageY;
+            } else {
+                x = e.clientX + document.body.scrollLeft + this.element.scrollLeft;
+                y = e.clientY + document.body.scrollTop + this.element.scrollTop;
+            }
+            x -= this.element.offsetLeft;
+            y -= this.element.offsetTop;
+            //console.log(new Point(x, y));
+            return new _Point.Point(x, y);
+        }
+    }, {
+        key: "getListenersByEvent",
+        value: function getListenersByEvent(event) {
+            var listeners = [];
+            this.listeners.forEach(function (value) {
+                if (value.name === event) {
+                    listeners.push(value);
+                }
+            });
+            return listeners;
+        }
+    }]);
+
+    return ListenerDelegate;
+}();
+
+},{"../primitives/Point":8}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var OnDragListener = exports.OnDragListener = function () {
+    function OnDragListener(element, onAction) {
+        _classCallCheck(this, OnDragListener);
+
+        this.name = "onDragListener";
+        this.downPoint = null;
+        this.lastEventPoint = null;
+        this.element = element;
+        this.onAction = onAction;
+    }
+
+    _createClass(OnDragListener, [{
+        key: "listen",
+        value: function listen() {
+            var _this = this;
+
+            var listeners = [];
+            listeners.push({
+                name: "mousedown",
+                element: this.element,
+                onAction: function onAction(event) {
+                    if (_this.element.containsPoint(event.point)) {
+                        _this.downPoint = event.point;
+                    }
+                }
+            });
+            listeners.push({
+                name: "mouseup",
+                element: document.body,
+                onAction: function onAction() {
+                    _this.downPoint = null;
+                }
+            });
+            var callback = this.onAction;
+            listeners.push({
+                name: "mousemove",
+                element: document.body,
+                onAction: function onAction(event, canvas) {
+                    if (_this.downPoint) {
+                        //let delta = event.point.delta(this.downPoint);
+                        _this.downPoint = event.point;
+                        if (event.point.equals(_this.lastEventPoint)) {
+                            return;
+                        }
+                        _this.lastEventPoint = event.point;
+                        var e = {
+                            point: event.point,
+                            data: event
+                        };
+                        callback(e, canvas);
+                    }
+                }
+            });
+            return listeners;
+        }
+    }]);
+
+    return OnDragListener;
+}();
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Circle = exports.Circle = function () {
+    function Circle(center, radius) {
+        var fillStyle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#000";
+        var strokeStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "#000";
+        var lineWidth = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+
+        _classCallCheck(this, Circle);
+
+        this._center = center;
+        this.radius = radius;
+        this.fillStyle = fillStyle;
+        this.strokeStyle = strokeStyle;
+        this.lineWidth = lineWidth;
+    }
+
+    _createClass(Circle, [{
+        key: "draw",
+        value: function draw(canvas) {
+            canvas.ctx.beginPath();
+            canvas.ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI, false);
+            canvas.ctx.fillStyle = this.fillStyle;
+            canvas.ctx.fill();
+            canvas.ctx.lineWidth = this.lineWidth;
+            canvas.ctx.strokeStyle = this.strokeStyle;
+            canvas.ctx.stroke();
+        }
+    }, {
+        key: "containsPoint",
+        value: function containsPoint(point) {
+            var dx = point.x - this.center.x;
+            var dy = point.y - this.center.y;
+            return dx * dx + dy * dy < this.radius * this.radius;
+        }
+    }, {
+        key: "listeners",
+        value: function listeners() {
+            return null;
+        }
+    }, {
+        key: "onMouseHover",
+        value: function onMouseHover(x, y) {}
+    }, {
+        key: "onMouseClick",
+        value: function onMouseClick(x, y) {}
+    }, {
+        key: "center",
+        get: function get() {
+            return this._center;
+        },
+        set: function set(value) {
+            this._center.x = value.x;
+            this._center.y = value.y;
+        }
+    }]);
+
+    return Circle;
+}();
+
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -96,21 +441,32 @@ var Line = exports.Line = function () {
 
         _classCallCheck(this, Line);
 
-        this.p1 = p1;
-        this.p2 = p2;
+        this._left = p1;
+        this._right = p2;
         this.lineWidth = lineWidth;
         this.lineColor = lineColor;
+        this.checkPoints();
     }
 
     _createClass(Line, [{
         key: "draw",
         value: function draw(canvas) {
-            canvas.drawLine(this.p1, this.p2, this.lineWidth, this.lineColor);
+            canvas.ctx.beginPath();
+            canvas.ctx.moveTo(this.left.x, this.left.y);
+            canvas.ctx.lineTo(this.right.x, this.right.y);
+            canvas.ctx.lineWidth = this.lineWidth;
+            canvas.ctx.strokeStyle = this.lineColor;
+            canvas.ctx.stroke();
         }
     }, {
         key: "containsPoint",
-        value: function containsPoint(x, y) {
+        value: function containsPoint(point) {
             return false;
+        }
+    }, {
+        key: "listeners",
+        value: function listeners() {
+            return null;
         }
     }, {
         key: "onMouseHover",
@@ -118,49 +474,100 @@ var Line = exports.Line = function () {
     }, {
         key: "onMouseClick",
         value: function onMouseClick(x, y) {}
+    }, {
+        key: "checkPoints",
+        value: function checkPoints() {
+            if (this._left.x > this._right.x) {
+                var temp = this._left;
+                this._left = this._right;
+                this._right = temp;
+            }
+        }
+    }, {
+        key: "left",
+        get: function get() {
+            return this._left;
+        },
+        set: function set(value) {
+            this._left = value;
+            this.checkPoints();
+        }
+    }, {
+        key: "right",
+        get: function get() {
+            return this._right;
+        },
+        set: function set(value) {
+            this._right = value;
+            this.checkPoints();
+        }
     }]);
 
     return Line;
 }();
 
-},{}],3:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Point = exports.Point = function Point(x, y) {
-    _classCallCheck(this, Point);
+var Point = exports.Point = function () {
+    function Point(x, y) {
+        _classCallCheck(this, Point);
 
-    this.x = x;
-    this.y = y;
-};
+        this._x = x;
+        this._y = y;
+    }
 
-},{}],4:[function(require,module,exports){
-"use strict";
+    _createClass(Point, [{
+        key: "equals",
+        value: function equals(point) {
+            return point != null && this.x === point.x && this.y === point.y;
+        }
+    }, {
+        key: "toString",
+        value: function toString() {
+            return "x: " + this.x + " y: " + this.y;
+        }
+    }, {
+        key: "delta",
+        value: function delta(point) {
+            return new Point(this.x - point.x, this.y - point.y);
+        }
+    }, {
+        key: "plus",
+        value: function plus(point) {
+            this.x += point.x;
+            this.y += point.y;
+        }
+    }, {
+        key: "x",
+        get: function get() {
+            return this._x;
+        },
+        set: function set(value) {
+            this._x = value;
+        }
+    }, {
+        key: "y",
+        get: function get() {
+            return this._y;
+        },
+        set: function set(value) {
+            this._y = value;
+        }
+    }]);
 
-var _jquery = require("jquery");
+    return Point;
+}();
 
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _Canvas = require("./Canvas");
-
-var _Line = require("./Line");
-
-var _Point = require("./Point");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-(0, _jquery2.default)(function () {
-    var canvas = new _Canvas.Canvas(600, 600);
-    canvas.addElement(new _Line.Line(new _Point.Point(0, 0), new _Point.Point(600, 600)));
-    canvas.refresh();
-});
-
-},{"./Canvas":1,"./Line":2,"./Point":3,"jquery":5}],5:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -10415,4 +10822,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[4]);
+},{}]},{},[3]);

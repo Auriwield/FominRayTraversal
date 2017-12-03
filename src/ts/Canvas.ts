@@ -4,18 +4,19 @@ import {ListenerDelegate} from "./listeners/ListenerDelegate";
 import {Listener} from "./listeners/Listener";
 
 export class Canvas {
-
     private _width: number;
     private _height: number;
     private canvas: HTMLCanvasElement;
     private elements: Array<GraphicElement>;
     private listenerDelegate: ListenerDelegate;
+    private _ratio: number;
 
     ctx: CanvasRenderingContext2D;
 
     constructor(width: number, height: number) {
         this._width = width;
         this._height = height;
+        this._ratio = window.devicePixelRatio;
         this.init();
     }
 
@@ -25,12 +26,10 @@ export class Canvas {
         this.listenerDelegate = new ListenerDelegate(this.canvas, this);
         this.canvas.setAttribute("width", `${this._width}px`);
         this.canvas.setAttribute("height", `${this._height}px`);
+        this.canvas.style.width = `${this._width / this.ratio}px`;
+        this.canvas.style.height = `${this._height / this.ratio}px`;
         this.elements = [];
         this.clear();
-    }
-
-    private drawGrid() {
-
     }
 
     refresh() {
@@ -40,7 +39,6 @@ export class Canvas {
 
     clear() {
         this.fill("white");
-        this.drawGrid();
     }
 
     fill(color: string | CanvasGradient | CanvasPattern) {
@@ -53,7 +51,7 @@ export class Canvas {
     addElement(...elements: GraphicElement[]) {
         this.elements = this.elements.concat(elements);
 
-        let listeners : Array<Listener> = [];
+        let listeners: Array<Listener> = [];
         elements.forEach(element => {
             listeners = listeners.concat(element.listeners());
         });
@@ -67,5 +65,9 @@ export class Canvas {
 
     get height(): number {
         return this._height;
+    }
+
+    get ratio(): number {
+        return this._ratio;
     }
 }

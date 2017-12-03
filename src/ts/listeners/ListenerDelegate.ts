@@ -26,7 +26,7 @@ export class ListenerDelegate {
 
             if (!value || !value.name
                 || this.registeredEvents.indexOf(value.name) !== -1) {
-                console.log("drop " + value.name);
+                if (value.name) console.log("drop " + value.name);
                 return;
             }
 
@@ -66,7 +66,7 @@ export class ListenerDelegate {
         y -= this.element.offsetTop;
 
         //console.log(new Point(x, y));
-        return new Point(x, y);
+        return new Point(x * this.canvas.ratio, y * this.canvas.ratio);
     }
 
     getListenersByEvent(event: string) {

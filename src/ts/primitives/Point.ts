@@ -37,8 +37,7 @@ export class Point {
         return new Point(this.x - point.x, this.y - point.y);
     }
 
-    plus(point: Point) : void {
-        this.x += point.x;
-        this.y += point.y;
+    move(x : number, y : number) : Point {
+        return new Point(this.x + x, this.y + y);
     }
 }

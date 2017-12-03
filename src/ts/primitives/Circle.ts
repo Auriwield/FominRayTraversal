@@ -6,8 +6,8 @@ import {Listener} from "../listeners/Listener";
 export class Circle implements GraphicElement {
     private _center: Point;
     private radius: number;
-    private fillStyle : string;
-    private strokeStyle : string;
+    private fillStyle: string;
+    private strokeStyle: string;
     private lineWidth: number;
 
     constructor(center: Point,
@@ -33,7 +33,7 @@ export class Circle implements GraphicElement {
         canvas.ctx.stroke();
     }
 
-    containsPoint(point : Point): boolean {
+    containsPoint(point: Point): boolean {
 
         let dx = point.x - this.center.x;
         let dy = point.y - this.center.y;
@@ -45,12 +45,6 @@ export class Circle implements GraphicElement {
         return null;
     }
 
-    onMouseHover(x: number, y: number): void {
-    }
-
-    onMouseClick(x: number, y: number): void {
-    }
-
     get center(): Point {
         return this._center;
     }
@@ -58,5 +52,17 @@ export class Circle implements GraphicElement {
     set center(value: Point) {
         this._center.x = value.x;
         this._center.y = value.y;
+    }
+
+    intersects(circle: Circle): boolean {
+        let rm = this.radius - circle.radius;
+        let rp = this.radius + circle.radius;
+
+        let dx = this.center.x - circle.center.x;
+        let dy = this.center.y - circle.center.y;
+
+        let d = dx * dx + dy * dy;
+
+        return rm * rm <= d && d <= rp * rp;
     }
 }

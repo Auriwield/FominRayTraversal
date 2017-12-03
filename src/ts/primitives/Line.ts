@@ -30,14 +30,8 @@ export class Line implements GraphicElement {
         return false;
     }
 
-    listeners(): Array<Listener> {
-        return null;
-    }
-
-    onMouseHover(x: number, y: number): void {
-    }
-
-    onMouseClick(x: number, y: number): void {
+    listeners(): Listener[] {
+        return [];
     }
 
     get left(): Point {
@@ -64,5 +58,27 @@ export class Line implements GraphicElement {
             this._left = this._right;
             this._right = temp;
         }
+    }
+
+    intersects(line: Line): boolean {
+        let l1p1 = this.left;
+        let l1p2 = this.right;
+        let l2p1 = line.left;
+        let l2p2 = line.right;
+
+        let q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
+        let d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
+
+        if (d == 0) {
+            return false;
+        }
+
+        let r = q / d;
+
+        q = (l1p1.y - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
+
+        let s = q / d;
+
+        return !(r < 0 || r > 1 || s < 0 || s > 1);
     }
 }

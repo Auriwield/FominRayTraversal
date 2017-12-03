@@ -24,6 +24,7 @@ var Canvas = exports.Canvas = function () {
 
         this._width = width;
         this._height = height;
+        this._ratio = window.devicePixelRatio;
         this.init();
     }
 
@@ -35,12 +36,11 @@ var Canvas = exports.Canvas = function () {
             this.listenerDelegate = new _ListenerDelegate.ListenerDelegate(this.canvas, this);
             this.canvas.setAttribute("width", this._width + "px");
             this.canvas.setAttribute("height", this._height + "px");
+            this.canvas.style.width = this._width / this.ratio + "px";
+            this.canvas.style.height = this._height / this.ratio + "px";
             this.elements = [];
             this.clear();
         }
-    }, {
-        key: "drawGrid",
-        value: function drawGrid() {}
     }, {
         key: "refresh",
         value: function refresh() {
@@ -55,7 +55,6 @@ var Canvas = exports.Canvas = function () {
         key: "clear",
         value: function clear() {
             this.fill("white");
-            this.drawGrid();
         }
     }, {
         key: "fill",
@@ -89,12 +88,164 @@ var Canvas = exports.Canvas = function () {
         get: function get() {
             return this._height;
         }
+    }, {
+        key: "ratio",
+        get: function get() {
+            return this._ratio;
+        }
     }]);
 
     return Canvas;
 }();
 
-},{"./listeners/ListenerDelegate":4,"jquery":9}],2:[function(require,module,exports){
+},{"./listeners/ListenerDelegate":5,"jquery":11}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Grid = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Rectangle = require("./primitives/Rectangle");
+
+var _Point = require("./primitives/Point");
+
+var _Line = require("./primitives/Line");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Grid = exports.Grid = function () {
+    function Grid(size, width, height) {
+        _classCallCheck(this, Grid);
+
+        this.size = size;
+        this.rects = [];
+        this.lines = [];
+        this.width = width;
+        this.height = height;
+        var rectWidth = this.width / this.size;
+        var rectHeight = this.width / this.size;
+        for (var i = 0; i < size; i++) {
+            for (var j = 0; j < size; j++) {
+                var origin = new _Point.Point(rectWidth * j, rectHeight * i);
+                this.rects.push(new _Rectangle.Rectangle(origin, rectWidth, rectHeight));
+            }
+        }
+        var lineWidth = 1;
+        var lineColor = "#222";
+        for (var _i = 1; _i < size; _i++) {
+            var _height = rectHeight * _i;
+            var left = new _Point.Point(0, _height);
+            var right = new _Point.Point(this.width, _height);
+            this.lines.push(new _Line.Line(left, right, lineWidth, lineColor));
+        }
+        for (var _j = 1; _j < size; _j++) {
+            var _width = rectWidth * _j;
+            var _left = new _Point.Point(_width, 0);
+            var _right = new _Point.Point(_width, this.height);
+            this.lines.push(new _Line.Line(_left, _right, lineWidth, lineColor));
+        }
+    }
+
+    _createClass(Grid, [{
+        key: "updateIntersection",
+        value: function updateIntersection(line) {
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.rects[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var rect = _step.value;
+
+                    rect.fillStyle = rect.intersects(line) ? "#ff5252" : "#ffffff";
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+        }
+    }, {
+        key: "draw",
+        value: function draw(canvas) {
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = this.rects[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var rect = _step2.value;
+
+                    rect.draw(canvas);
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = this.lines[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var line = _step3.value;
+
+                    line.draw(canvas);
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+        }
+    }, {
+        key: "containsPoint",
+        value: function containsPoint(point) {
+            return null;
+        }
+    }, {
+        key: "listeners",
+        value: function listeners() {
+            return [];
+        }
+    }]);
+
+    return Grid;
+}();
+
+},{"./primitives/Line":8,"./primitives/Point":9,"./primitives/Rectangle":10}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -113,12 +264,14 @@ var _OnDragListener = require("./listeners/OnDragListener");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var MovableLine = exports.MovableLine = function () {
-    function MovableLine(line) {
+    function MovableLine(line, canvas) {
         _classCallCheck(this, MovableLine);
 
         this.line = line;
-        this.leftEdge = new _Circle.Circle(line.left, 5);
-        this.rightEdge = new _Circle.Circle(line.right, 5);
+        this.canvas = canvas;
+        this.edgeRadius = 20;
+        this.leftEdge = new _Circle.Circle(line.left, this.edgeRadius);
+        this.rightEdge = new _Circle.Circle(line.right, this.edgeRadius);
     }
 
     _createClass(MovableLine, [{
@@ -140,34 +293,46 @@ var MovableLine = exports.MovableLine = function () {
 
             var onDragLeftListener = new _OnDragListener.OnDragListener(this.leftEdge, function (event, canvas) {
                 _this.leftEdge.center = event.point;
-                _this.checkPoint(_this.leftEdge.center, new _Point.Point(0, 0), canvas.width, canvas.height);
+                _this.checkPoint(_this.leftEdge.center);
+                if (_this._onUpdate) _this._onUpdate(_this.line);
                 canvas.refresh();
             });
             var onDragRightListener = new _OnDragListener.OnDragListener(this.rightEdge, function (event, canvas) {
                 _this.rightEdge.center = event.point;
-                _this.checkPoint(_this.rightEdge.center, new _Point.Point(0, 0), canvas.width, canvas.height);
+                _this.checkPoint(_this.rightEdge.center);
+                if (_this._onUpdate) _this._onUpdate(_this.line);
                 canvas.refresh();
             });
             return onDragLeftListener.listen().concat(onDragRightListener.listen());
         }
-        // checks if point p in specified rectangle
         // p1 - left top corner
 
     }, {
         key: "checkPoint",
-        value: function checkPoint(p, p1, width, height) {
-            var p2 = new _Point.Point(p1.x + width, p1.y + height);
+        value: function checkPoint(p) {
+            var r = this.edgeRadius;
+            var p1 = new _Point.Point(r, r);
+            var p2 = new _Point.Point(p1.x + this.canvas.width - r * 2, p1.y + this.canvas.height - r * 2);
             if (p.x < p1.x) p.x = p1.x;
             if (p.y < p1.y) p.y = p1.y;
             if (p.x > p2.x) p.x = p2.x;
             if (p.y > p2.y) p.y = p2.y;
+            if (this.leftEdge.intersects(this.rightEdge)) {
+                // todo
+            }
+        }
+    }, {
+        key: "onUpdate",
+        set: function set(value) {
+            this._onUpdate = value;
+            if (this._onUpdate) this._onUpdate(this.line);
         }
     }]);
 
     return MovableLine;
 }();
 
-},{"./listeners/OnDragListener":5,"./primitives/Circle":6,"./primitives/Point":8}],3:[function(require,module,exports){
+},{"./listeners/OnDragListener":6,"./primitives/Circle":7,"./primitives/Point":9}],4:[function(require,module,exports){
 "use strict";
 
 var _jquery = require("jquery");
@@ -182,18 +347,31 @@ var _Point = require("./primitives/Point");
 
 var _MovableLine = require("./MovableLine");
 
+var _Grid = require("./Grid");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (0, _jquery2.default)(function () {
-    var canvas = new _Canvas.Canvas(600, 600);
+    var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    var width = w * window.devicePixelRatio * 0.8;
+    var height = h * window.devicePixelRatio * 0.8;
+    var side = Math.min(width, height);
+    var canvas = new _Canvas.Canvas(side, side);
+    var grid = new _Grid.Grid(20, side, side);
+    canvas.addElement(grid);
     var leftPoint = new _Point.Point(100, 100);
     var rightPoint = new _Point.Point(500, 500);
     var line = new _Line.Line(leftPoint, rightPoint);
-    canvas.addElement(new _MovableLine.MovableLine(line));
+    var movableLine = new _MovableLine.MovableLine(line, canvas);
+    movableLine.onUpdate = function (line) {
+        return grid.updateIntersection(line);
+    };
+    canvas.addElement(movableLine);
     canvas.refresh();
 });
 
-},{"./Canvas":1,"./MovableLine":2,"./primitives/Line":7,"./primitives/Point":8,"jquery":9}],4:[function(require,module,exports){
+},{"./Canvas":1,"./Grid":2,"./MovableLine":3,"./primitives/Line":8,"./primitives/Point":9,"jquery":11}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -230,7 +408,7 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
 
             listeners.forEach(function (value) {
                 if (!value || !value.name || _this.registeredEvents.indexOf(value.name) !== -1) {
-                    console.log("drop " + value.name);
+                    if (value.name) console.log("drop " + value.name);
                     return;
                 }
                 var element = value.element instanceof HTMLElement ? value.element : _this.element;
@@ -265,7 +443,7 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
             x -= this.element.offsetLeft;
             y -= this.element.offsetTop;
             //console.log(new Point(x, y));
-            return new _Point.Point(x, y);
+            return new _Point.Point(x * this.canvas.ratio, y * this.canvas.ratio);
         }
     }, {
         key: "getListenersByEvent",
@@ -283,7 +461,7 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
     return ListenerDelegate;
 }();
 
-},{"../primitives/Point":8}],5:[function(require,module,exports){
+},{"../primitives/Point":9}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -354,7 +532,7 @@ var OnDragListener = exports.OnDragListener = function () {
     return OnDragListener;
 }();
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -404,11 +582,15 @@ var Circle = exports.Circle = function () {
             return null;
         }
     }, {
-        key: "onMouseHover",
-        value: function onMouseHover(x, y) {}
-    }, {
-        key: "onMouseClick",
-        value: function onMouseClick(x, y) {}
+        key: "intersects",
+        value: function intersects(circle) {
+            var rm = this.radius - circle.radius;
+            var rp = this.radius + circle.radius;
+            var dx = this.center.x - circle.center.x;
+            var dy = this.center.y - circle.center.y;
+            var d = dx * dx + dy * dy;
+            return rm * rm <= d && d <= rp * rp;
+        }
     }, {
         key: "center",
         get: function get() {
@@ -423,7 +605,7 @@ var Circle = exports.Circle = function () {
     return Circle;
 }();
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -466,14 +648,8 @@ var Line = exports.Line = function () {
     }, {
         key: "listeners",
         value: function listeners() {
-            return null;
+            return [];
         }
-    }, {
-        key: "onMouseHover",
-        value: function onMouseHover(x, y) {}
-    }, {
-        key: "onMouseClick",
-        value: function onMouseClick(x, y) {}
     }, {
         key: "checkPoints",
         value: function checkPoints() {
@@ -482,6 +658,23 @@ var Line = exports.Line = function () {
                 this._left = this._right;
                 this._right = temp;
             }
+        }
+    }, {
+        key: "intersects",
+        value: function intersects(line) {
+            var l1p1 = this.left;
+            var l1p2 = this.right;
+            var l2p1 = line.left;
+            var l2p2 = line.right;
+            var q = (l1p1.y - l2p1.y) * (l2p2.x - l2p1.x) - (l1p1.x - l2p1.x) * (l2p2.y - l2p1.y);
+            var d = (l1p2.x - l1p1.x) * (l2p2.y - l2p1.y) - (l1p2.y - l1p1.y) * (l2p2.x - l2p1.x);
+            if (d == 0) {
+                return false;
+            }
+            var r = q / d;
+            q = (l1p1.y - l2p1.y) * (l1p2.x - l1p1.x) - (l1p1.x - l2p1.x) * (l1p2.y - l1p1.y);
+            var s = q / d;
+            return !(r < 0 || r > 1 || s < 0 || s > 1);
         }
     }, {
         key: "left",
@@ -506,7 +699,7 @@ var Line = exports.Line = function () {
     return Line;
 }();
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -541,10 +734,9 @@ var Point = exports.Point = function () {
             return new Point(this.x - point.x, this.y - point.y);
         }
     }, {
-        key: "plus",
-        value: function plus(point) {
-            this.x += point.x;
-            this.y += point.y;
+        key: "move",
+        value: function move(x, y) {
+            return new Point(this.x + x, this.y + y);
         }
     }, {
         key: "x",
@@ -567,7 +759,80 @@ var Point = exports.Point = function () {
     return Point;
 }();
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Rectangle = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Line = require("./Line");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Rectangle = exports.Rectangle = function () {
+    function Rectangle(origin, width, height) {
+        var strokeColor = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "#ffffff";
+        var fillColor = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "#ffffff";
+
+        _classCallCheck(this, Rectangle);
+
+        this.origin = origin;
+        this.width = width;
+        this.height = height;
+        this.strokeStyle = strokeColor;
+        this._fillStyle = fillColor;
+    }
+
+    _createClass(Rectangle, [{
+        key: "draw",
+        value: function draw(canvas) {
+            canvas.ctx.lineWidth = 1;
+            canvas.ctx.strokeStyle = this.strokeStyle;
+            canvas.ctx.fillStyle = this._fillStyle;
+            canvas.ctx.strokeRect(this.origin.x, this.origin.y, this.width, this.height);
+            canvas.ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
+        }
+    }, {
+        key: "listeners",
+        value: function listeners() {
+            return [];
+        }
+    }, {
+        key: "containsPoint",
+        value: function containsPoint(point) {
+            return point.x >= this.origin.x && point.y >= this.origin.y && point.x <= this.origin.x + this.width && point.y <= this.origin.y + this.height;
+        }
+    }, {
+        key: "intersects",
+        value: function intersects(line) {
+            if (this.containsPoint(line.left) || this.containsPoint(line.right)) {
+                return true;
+            }
+            var topLeft = this.origin;
+            var topRight = this.origin.move(this.width, 0);
+            var bottomLeft = this.origin.move(0, this.height);
+            var bottomRight = this.origin.move(this.width, this.height);
+            var top = new _Line.Line(topLeft, topRight);
+            var left = new _Line.Line(topLeft, bottomLeft);
+            var right = new _Line.Line(topRight, bottomRight);
+            var bottom = new _Line.Line(bottomLeft, bottomRight);
+            return line.intersects(top) || line.intersects(left) || line.intersects(right) || line.intersects(bottom);
+        }
+    }, {
+        key: "fillStyle",
+        set: function set(value) {
+            this._fillStyle = value;
+        }
+    }]);
+
+    return Rectangle;
+}();
+
+},{"./Line":8}],11:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -10822,4 +11087,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[3]);
+},{}]},{},[4]);

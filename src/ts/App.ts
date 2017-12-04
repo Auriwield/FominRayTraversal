@@ -22,12 +22,8 @@ $(() => {
 
     canvas.addElement(grid);
 
-    let leftPoint = new Point(100, 100);
-    let rightPoint = new Point(500, 500);
-
-    let line = new Line(leftPoint, rightPoint);
-    let movableLine = new MovableLine(line, canvas);
-    let circleKeeper = new CircleKeeper(grid, 0);
+    let movableLine = new MovableLine(canvas);
+    let circleKeeper = new CircleKeeper(grid, 15);
 
     movableLine.addCallback(
         (line: Line) => {
@@ -35,13 +31,27 @@ $(() => {
             circleKeeper.updateIntersection(rects, line)
         });
 
-    canvas.addElement(movableLine);
     canvas.addElement(circleKeeper);
+    canvas.addElement(movableLine);
     canvas.refresh();
 
     $("#trace-circle-area").change((evt) => {
         let e = <any> evt;
-        Config.traceCircleArea = e.target.checked;
+        Config.circleTraversal = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+
+    $("#trace-line-area").click((evt) => {
+        let e = <any> evt;
+        Config.lineTraversal = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+
+    $("#show-grid").click((evt) => {
+        let e = <any> evt;
+        Config.showGrid = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });

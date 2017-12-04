@@ -1,6 +1,8 @@
 
 let Config : any = {
-    "traceCircleArea" : false
+    "circleTraversal" : false,
+    "showGrid" : true,
+    "lineTraversal" : true
 };
 
 export {Config};

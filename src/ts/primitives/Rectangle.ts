@@ -9,7 +9,7 @@ export class Rectangle implements GraphicElement {
     private origin: Point;
     private width: number;
     private height: number;
-    private strokeStyle: string;
+    private _strokeStyle: string;
     private _fillStyle: string;
 
     constructor(origin: Point,
@@ -20,14 +20,14 @@ export class Rectangle implements GraphicElement {
         this.origin = origin;
         this.width = width;
         this.height = height;
-        this.strokeStyle = strokeColor;
+        this._strokeStyle = strokeColor;
         this._fillStyle = fillColor;
     }
 
     draw(canvas: Canvas): void {
         canvas.ctx.lineWidth = 1;
 
-        canvas.ctx.strokeStyle = this.strokeStyle;
+        canvas.ctx.strokeStyle = this._strokeStyle;
         canvas.ctx.fillStyle = this._fillStyle;
 
         canvas.ctx.strokeRect(this.origin.x, this.origin.y, this.width, this.height);
@@ -89,6 +89,10 @@ export class Rectangle implements GraphicElement {
 
     set fillStyle(value: string) {
         this._fillStyle = value;
+    }
+
+    set strokeStyle(value: string) {
+        this._strokeStyle = value;
     }
 
     equals(rect: Rectangle) {

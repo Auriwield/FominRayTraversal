@@ -4,6 +4,7 @@ import {GraphicElement} from "./primitives/GraphicElement";
 import {Canvas} from "./Canvas";
 import {Listener} from "./listeners/Listener";
 import {Line} from "./primitives/Line";
+import {Config} from "./Config";
 
 export class Grid implements GraphicElement {
     // amount of cells in cols and rows
@@ -40,17 +41,17 @@ export class Grid implements GraphicElement {
             let right = new Point(this._width, height);
             this.lines.push(new Line(left, right, lineWidth, lineColor));
         }
-        
+
         for (let j = 1; j < size; j++) {
             let width = rectWidth * j;
             let left = new Point(width, 0);
             let right = new Point(width, this._height);
-            this.lines.push(new Line(left, right,  lineWidth, lineColor));
+            this.lines.push(new Line(left, right, lineWidth, lineColor));
         }
     }
 
-    updateIntersection(line: Line) : Rectangle[] {
-        let rects : Rectangle[] = [];
+    updateIntersection(line: Line): Rectangle[] {
+        let rects: Rectangle[] = [];
         for (let rect of this._rects) {
 
             let lineCrossesRect = rect.intersects(line);
@@ -59,7 +60,7 @@ export class Grid implements GraphicElement {
                 rects.push(rect)
             }
 
-            rect.fillStyle = lineCrossesRect ? "#ff5252" : "#ffffff"
+            rect.fillStyle = Config.lineTraversal && lineCrossesRect ? "#F44336" : "#ffffff"
         }
 
         return rects;
@@ -69,6 +70,9 @@ export class Grid implements GraphicElement {
         for (let rect of this._rects) {
             rect.draw(canvas);
         }
+
+        if (!Config.showGrid) return;
+
         for (let line of this.lines) {
             line.draw(canvas);
         }

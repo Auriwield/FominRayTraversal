@@ -5,7 +5,6 @@ import {Canvas} from "./Canvas";
 import {Listener} from "./listeners/Listener";
 import {Point} from "./primitives/Point";
 import {OnDragListener} from "./listeners/OnDragListener";
-import {timingSafeEqual} from "crypto";
 
 export class MovableLine implements GraphicElement {
     private line: Line;
@@ -15,13 +14,13 @@ export class MovableLine implements GraphicElement {
     private canvas: Canvas;
     private callbacks: ((line: Line) => void)[];
 
-    constructor(line: Line, canvas: Canvas) {
-        this.line = line;
+    constructor(canvas: Canvas) {
+        this.line = new Line(new Point(100, 100), new Point(500, 500), 12, "#212121");
         this.canvas = canvas;
         this.callbacks = [];
-        this.edgeRadius = 20;
-        this.leftEdge = new Circle(line.left, this.edgeRadius);
-        this.rightEdge = new Circle(line.right, this.edgeRadius);
+        this.edgeRadius = 24;
+        this.leftEdge = new Circle(this.line.left, this.edgeRadius, "#fff", "#212121", 10);
+        this.rightEdge = new Circle(this.line.right, this.edgeRadius, "#fff","#212121", 10);
     }
 
     draw(canvas: Canvas): void {
@@ -84,7 +83,7 @@ export class MovableLine implements GraphicElement {
 
             let l = Math.sqrt(dx * dx + dy * dy);
             let d = this.edgeRadius * 2 - l;
-            let rd = d/l;
+            let rd = d / l;
 
             dx *= rd;
             dy *= rd;
@@ -96,12 +95,12 @@ export class MovableLine implements GraphicElement {
             else if (p.equals(rc)) {
                 dx *= -1;
                 dy *= -1;
-                rc.move(dx , dy, true);
+                rc.move(dx, dy, true);
             }
         }
     }
 
-    addCallback(callback : (line: Line) => void) {
+    addCallback(callback: (line: Line) => void) {
         if (!callback) return;
         this.callbacks.push(callback);
         callback(this.line);

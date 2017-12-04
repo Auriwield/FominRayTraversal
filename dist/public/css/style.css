@@ -27,3 +27,8 @@ a {
   height: 40px;
   padding-top: 5px;
 }
+
+.form-check-label {
+  float: right;
+  margin-top: 3px;
+}

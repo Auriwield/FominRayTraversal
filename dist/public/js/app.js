@@ -184,6 +184,11 @@ var CircleKeeper = exports.CircleKeeper = function () {
     }, {
         key: "updateIntersection",
         value: function updateIntersection(rects, line) {
+            for (var i = 0; i < this.circlesAmount; i++) {
+                this.circleRectRelation[i][0].strokeStyle = "#000000";
+                this.circleRectRelation[i][0].fillStyle = "rgba(0,0,0,0)";
+                this.circleRectRelation[i][0].lineWidth = 2;
+            }
             var circles = this.getCirclesByRects(rects);
             if (circles.length == 0) return;
             var _iteratorNormalCompletion2 = true;
@@ -195,9 +200,9 @@ var CircleKeeper = exports.CircleKeeper = function () {
                     var circle = _step2.value;
 
                     if (line.intersectsCircle(circle)) {
-                        circle.strokeStyle = "#ff6666";
-                    } else {
-                        circle.strokeStyle = "#000000";
+                        circle.strokeStyle = "#9E9E9E";
+                        circle.fillStyle = "#fff";
+                        circle.lineWidth = 15;
                     }
                 }
             } catch (err) {
@@ -240,7 +245,7 @@ var CircleKeeper = exports.CircleKeeper = function () {
 
                                 if (rect.equals(crect)) {
                                     circles.push(circle);
-                                    if (_Config.Config.traceCircleArea) {
+                                    if (_Config.Config.circleTraversal) {
                                         var _iteratorNormalCompletion5 = true;
                                         var _didIteratorError5 = false;
                                         var _iteratorError5 = undefined;
@@ -249,7 +254,7 @@ var CircleKeeper = exports.CircleKeeper = function () {
                                             for (var _iterator5 = cRects[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                                                 var r = _step5.value;
 
-                                                r.fillStyle = "green";
+                                                r.fillStyle = "#4CAF50";
                                             }
                                         } catch (err) {
                                             _didIteratorError5 = true;
@@ -323,7 +328,9 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var Config = {
-    "traceCircleArea": false
+    "circleTraversal": false,
+    "showGrid": true,
+    "lineTraversal": true
 };
 exports.Config = Config;
 
@@ -342,6 +349,8 @@ var _Rectangle = require("./primitives/Rectangle");
 var _Point = require("./primitives/Point");
 
 var _Line = require("./primitives/Line");
+
+var _Config = require("./Config");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -394,7 +403,7 @@ var Grid = exports.Grid = function () {
                     if (lineCrossesRect) {
                         rects.push(rect);
                     }
-                    rect.fillStyle = lineCrossesRect ? "#ff5252" : "#ffffff";
+                    rect.fillStyle = _Config.Config.lineTraversal && lineCrossesRect ? "#F44336" : "#ffffff";
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -441,6 +450,7 @@ var Grid = exports.Grid = function () {
                 }
             }
 
+            if (!_Config.Config.showGrid) return;
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
@@ -496,7 +506,7 @@ var Grid = exports.Grid = function () {
     return Grid;
 }();
 
-},{"./primitives/Line":10,"./primitives/Point":11,"./primitives/Rectangle":12}],5:[function(require,module,exports){
+},{"./Config":3,"./primitives/Line":10,"./primitives/Point":11,"./primitives/Rectangle":12}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -505,6 +515,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.MovableLine = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Line = require("./primitives/Line");
 
 var _Circle = require("./primitives/Circle");
 
@@ -515,15 +527,15 @@ var _OnDragListener = require("./listeners/OnDragListener");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var MovableLine = exports.MovableLine = function () {
-    function MovableLine(line, canvas) {
+    function MovableLine(canvas) {
         _classCallCheck(this, MovableLine);
 
-        this.line = line;
+        this.line = new _Line.Line(new _Point.Point(100, 100), new _Point.Point(500, 500), 12, "#212121");
         this.canvas = canvas;
         this.callbacks = [];
-        this.edgeRadius = 20;
-        this.leftEdge = new _Circle.Circle(line.left, this.edgeRadius);
-        this.rightEdge = new _Circle.Circle(line.right, this.edgeRadius);
+        this.edgeRadius = 24;
+        this.leftEdge = new _Circle.Circle(this.line.left, this.edgeRadius, "#fff", "#212121", 10);
+        this.rightEdge = new _Circle.Circle(this.line.right, this.edgeRadius, "#fff", "#212121", 10);
     }
 
     _createClass(MovableLine, [{
@@ -609,7 +621,7 @@ var MovableLine = exports.MovableLine = function () {
     return MovableLine;
 }();
 
-},{"./listeners/OnDragListener":8,"./primitives/Circle":9,"./primitives/Point":11}],6:[function(require,module,exports){
+},{"./listeners/OnDragListener":8,"./primitives/Circle":9,"./primitives/Line":10,"./primitives/Point":11}],6:[function(require,module,exports){
 "use strict";
 
 var _jquery = require("jquery");
@@ -617,10 +629,6 @@ var _jquery = require("jquery");
 var _jquery2 = _interopRequireDefault(_jquery);
 
 var _Canvas = require("./Canvas");
-
-var _Line = require("./primitives/Line");
-
-var _Point = require("./primitives/Point");
 
 var _MovableLine = require("./MovableLine");
 
@@ -641,21 +649,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     var canvas = new _Canvas.Canvas(side, side);
     var grid = new _Grid.Grid(20, side, side);
     canvas.addElement(grid);
-    var leftPoint = new _Point.Point(100, 100);
-    var rightPoint = new _Point.Point(500, 500);
-    var line = new _Line.Line(leftPoint, rightPoint);
-    var movableLine = new _MovableLine.MovableLine(line, canvas);
-    var circleKeeper = new _CircleKeeper.CircleKeeper(grid, 0);
+    var movableLine = new _MovableLine.MovableLine(canvas);
+    var circleKeeper = new _CircleKeeper.CircleKeeper(grid, 15);
     movableLine.addCallback(function (line) {
         var rects = grid.updateIntersection(line);
         circleKeeper.updateIntersection(rects, line);
     });
-    canvas.addElement(movableLine);
     canvas.addElement(circleKeeper);
+    canvas.addElement(movableLine);
     canvas.refresh();
     (0, _jquery2.default)("#trace-circle-area").change(function (evt) {
         var e = evt;
-        _Config.Config.traceCircleArea = e.target.checked;
+        _Config.Config.circleTraversal = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+    (0, _jquery2.default)("#trace-line-area").click(function (evt) {
+        var e = evt;
+        _Config.Config.lineTraversal = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+    (0, _jquery2.default)("#show-grid").click(function (evt) {
+        var e = evt;
+        _Config.Config.showGrid = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });
@@ -663,7 +680,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
         circleKeeper.addCircle();
         movableLine.callCallbacks();
         canvas.refresh();
-        ç;
     });
     (0, _jquery2.default)("#remove-circle-button").click(function () {
         circleKeeper.removeCircle();
@@ -672,7 +688,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     });
 });
 
-},{"./Canvas":1,"./CircleKeeper":2,"./Config":3,"./Grid":4,"./MovableLine":5,"./primitives/Line":10,"./primitives/Point":11,"jquery":13}],7:[function(require,module,exports){
+},{"./Canvas":1,"./CircleKeeper":2,"./Config":3,"./Grid":4,"./MovableLine":5,"jquery":13}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -848,15 +864,15 @@ var Circle = exports.Circle = function () {
     function Circle(center, radius) {
         var fillStyle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#000";
         var strokeStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "#000";
-        var lineWidth = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+        var lineWidth = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 2;
 
         _classCallCheck(this, Circle);
 
         this._center = center;
         this._radius = radius;
-        this.fillStyle = fillStyle;
+        this._fillStyle = fillStyle;
         this._strokeStyle = strokeStyle;
-        this.lineWidth = lineWidth;
+        this._lineWidth = lineWidth;
     }
 
     _createClass(Circle, [{
@@ -864,9 +880,9 @@ var Circle = exports.Circle = function () {
         value: function draw(canvas) {
             canvas.ctx.beginPath();
             canvas.ctx.arc(this.center.x, this.center.y, this._radius, 0, 2 * Math.PI, false);
-            canvas.ctx.fillStyle = this.fillStyle;
+            canvas.ctx.fillStyle = this._fillStyle;
             canvas.ctx.fill();
-            canvas.ctx.lineWidth = this.lineWidth;
+            canvas.ctx.lineWidth = this._lineWidth;
             canvas.ctx.strokeStyle = this._strokeStyle;
             canvas.ctx.stroke();
         }
@@ -910,6 +926,16 @@ var Circle = exports.Circle = function () {
         key: "strokeStyle",
         set: function set(value) {
             this._strokeStyle = value;
+        }
+    }, {
+        key: "fillStyle",
+        set: function set(value) {
+            this._fillStyle = value;
+        }
+    }, {
+        key: "lineWidth",
+        set: function set(value) {
+            this._lineWidth = value;
         }
     }]);
 
@@ -1145,7 +1171,7 @@ var Rectangle = exports.Rectangle = function () {
         this.origin = origin;
         this.width = width;
         this.height = height;
-        this.strokeStyle = strokeColor;
+        this._strokeStyle = strokeColor;
         this._fillStyle = fillColor;
     }
 
@@ -1153,7 +1179,7 @@ var Rectangle = exports.Rectangle = function () {
         key: "draw",
         value: function draw(canvas) {
             canvas.ctx.lineWidth = 1;
-            canvas.ctx.strokeStyle = this.strokeStyle;
+            canvas.ctx.strokeStyle = this._strokeStyle;
             canvas.ctx.fillStyle = this._fillStyle;
             canvas.ctx.strokeRect(this.origin.x, this.origin.y, this.width, this.height);
             canvas.ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
@@ -1208,6 +1234,11 @@ var Rectangle = exports.Rectangle = function () {
         key: "fillStyle",
         set: function set(value) {
             this._fillStyle = value;
+        }
+    }, {
+        key: "strokeStyle",
+        set: function set(value) {
+            this._strokeStyle = value;
         }
     }]);
 

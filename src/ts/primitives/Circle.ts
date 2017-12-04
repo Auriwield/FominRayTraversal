@@ -6,29 +6,29 @@ import {Listener} from "../listeners/Listener";
 export class Circle implements GraphicElement {
     private _center: Point;
     private _radius: number;
-    private fillStyle: string;
+    private _fillStyle: string;
     private _strokeStyle: string;
-    private lineWidth: number;
+    private _lineWidth: number;
 
     constructor(center: Point,
                 radius: number,
                 fillStyle = "#000",
                 strokeStyle = "#000",
-                lineWidth = 1) {
+                lineWidth = 2) {
         this._center = center;
         this._radius = radius;
-        this.fillStyle = fillStyle;
+        this._fillStyle = fillStyle;
         this._strokeStyle = strokeStyle;
-        this.lineWidth = lineWidth;
+        this._lineWidth = lineWidth;
     }
 
     draw(canvas: Canvas): void {
         canvas.ctx.beginPath();
         canvas.ctx.arc(this.center.x, this.center.y,
             this._radius, 0, 2 * Math.PI, false);
-        canvas.ctx.fillStyle = this.fillStyle;
+        canvas.ctx.fillStyle = this._fillStyle;
         canvas.ctx.fill();
-        canvas.ctx.lineWidth = this.lineWidth;
+        canvas.ctx.lineWidth = this._lineWidth;
         canvas.ctx.strokeStyle = this._strokeStyle;
         canvas.ctx.stroke();
     }
@@ -72,5 +72,14 @@ export class Circle implements GraphicElement {
 
     set strokeStyle(value: string) {
         this._strokeStyle = value;
+    }
+
+
+    set fillStyle(value: string) {
+        this._fillStyle = value;
+    }
+
+    set lineWidth(value: number) {
+        this._lineWidth = value;
     }
 }

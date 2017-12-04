@@ -56,15 +56,21 @@ export class CircleKeeper implements GraphicElement {
     }
 
     updateIntersection(rects: Rectangle[], line: Line) {
+
+        for (let i = 0; i < this.circlesAmount; i++) {
+            this.circleRectRelation[i][0].strokeStyle = "#000000";
+            this.circleRectRelation[i][0].fillStyle = "rgba(0,0,0,0)";
+            this.circleRectRelation[i][0].lineWidth = 2;
+        }
+
         let circles = this.getCirclesByRects(rects);
         if (circles.length == 0) return;
 
         for (let circle of circles) {
             if (line.intersectsCircle(circle)) {
-                circle.strokeStyle = "#ff6666";
-            }
-            else {
-                circle.strokeStyle = "#000000";
+                circle.strokeStyle = "#9E9E9E";
+                circle.fillStyle = "#fff";
+                circle.lineWidth = 15;
             }
         }
     }
@@ -81,9 +87,9 @@ export class CircleKeeper implements GraphicElement {
                 for (let crect of cRects) {
                     if (rect.equals(crect)) {
                         circles.push(circle);
-                        if (Config.traceCircleArea) {
+                        if (Config.circleTraversal) {
                             for (let r of cRects) {
-                                r.fillStyle = "green";
+                                r.fillStyle = "#4CAF50";
                             }
                         }
                         continue l;

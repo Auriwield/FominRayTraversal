@@ -28,6 +28,11 @@ a {
   padding-top: 5px;
 }
 
+.config-pane .container {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 .form-check-label {
   float: right;
   margin-top: 3px;

@@ -5,21 +5,20 @@ block content
     canvas#canvas
   .config-pane
     .container
-      .row
-        .col-8
-          div.form-check.form-check-inline
-            label.form-check-label
-              input#trace-circle-area.form-check-input(type="checkbox", value="")
-              | Circle Traversal
-          div.form-check.form-check-inline
-            label.form-check-label
-              input#trace-line-area.form-check-input(type="checkbox", value="", checked)
-              | Line Traversal
-          div.form-check.form-check-inline
-            label.form-check-label
-              input#show-grid.form-check-input(type="checkbox", value="", checked)
-              | Show Grid
-        .col-4
+      .form-row
+        div.form-check.form-check-inline
+          label.form-check-label
+            input#trace-circle-area.form-check-input(type="checkbox", value="")
+            | Circle Traversal
+        div.form-check.form-check-inline
+          label.form-check-label
+            input#trace-line-area.form-check-input(type="checkbox", value="", checked)
+            | Line Traversal
+        div.form-check.form-check-inline
+          label.form-check-label
+            input#show-grid.form-check-input(type="checkbox", value="", checked)
+            | Show Grid
+        div.form-check.form-check-inline
           div.btn-group
             button#add-circle-button.btn.btn-secondary.btn-sm(type='button') Add circle
             button#remove-circle-button.btn.btn-secondary.btn-sm(type='button') Remove circle

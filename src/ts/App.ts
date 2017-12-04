@@ -49,7 +49,7 @@ $(() => {
     $("#add-circle-button").click(() => {
         circleKeeper.addCircle();
         movableLine.callCallbacks();
-        canvas.refresh();ç
+        canvas.refresh();
     });
 
     $("#remove-circle-button").click(() => {

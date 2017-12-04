@@ -4,6 +4,8 @@ import {Line} from "./primitives/Line";
 import {Point} from "./primitives/Point";
 import {MovableLine} from "./MovableLine";
 import {Grid} from "./Grid";
+import {CircleKeeper} from "./CircleKeeper";
+import {Config} from "./Config";
 
 $(() => {
 
@@ -25,9 +27,34 @@ $(() => {
 
     let line = new Line(leftPoint, rightPoint);
     let movableLine = new MovableLine(line, canvas);
+    let circleKeeper = new CircleKeeper(grid, 0);
 
-    movableLine.onUpdate = (line: Line) => grid.updateIntersection(line);
+    movableLine.addCallback(
+        (line: Line) => {
+            let rects = grid.updateIntersection(line);
+            circleKeeper.updateIntersection(rects, line)
+        });
 
     canvas.addElement(movableLine);
+    canvas.addElement(circleKeeper);
     canvas.refresh();
+
+    $("#trace-circle-area").change((evt) => {
+        let e = <any> evt;
+        Config.traceCircleArea = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+
+    $("#add-circle-button").click(() => {
+        circleKeeper.addCircle();
+        movableLine.callCallbacks();
+        canvas.refresh();ç
+    });
+
+    $("#remove-circle-button").click(() => {
+        circleKeeper.removeCircle();
+        movableLine.callCallbacks();
+        canvas.refresh();
+    })
 });

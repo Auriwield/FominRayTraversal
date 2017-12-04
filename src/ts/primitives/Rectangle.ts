@@ -3,6 +3,7 @@ import {Point} from "./Point";
 import {Canvas} from "../Canvas";
 import {Listener} from "../listeners/Listener";
 import {Line} from "./Line";
+import {Circle} from "./Circle";
 
 export class Rectangle implements GraphicElement {
     private origin: Point;
@@ -50,6 +51,29 @@ export class Rectangle implements GraphicElement {
             return true;
         }
 
+        let sides = this.sides();
+
+        return line.intersects(sides.top)
+            || line.intersects(sides.left)
+            || line.intersects(sides.right)
+            || line.intersects(sides.bottom);
+    }
+
+    intersectsCircle(circle: Circle): boolean {
+
+        if (this.containsPoint(circle.center)) {
+            return true;
+        }
+
+        let sides = this.sides();
+
+        return sides.top.intersectsCircle(circle)
+            || sides.left.intersectsCircle(circle)
+            || sides.right.intersectsCircle(circle)
+            || sides.bottom.intersectsCircle(circle)
+    }
+
+    sides() {
         let topLeft = this.origin;
         let topRight = this.origin.move(this.width, 0);
         let bottomLeft = this.origin.move(0, this.height);
@@ -60,13 +84,16 @@ export class Rectangle implements GraphicElement {
         let right = new Line(topRight, bottomRight);
         let bottom = new Line(bottomLeft, bottomRight);
 
-        return line.intersects(top)
-            || line.intersects(left)
-            || line.intersects(right)
-            || line.intersects(bottom);
+        return {top, left, right, bottom};
     }
 
     set fillStyle(value: string) {
         this._fillStyle = value;
+    }
+
+    equals(rect: Rectangle) {
+        return this.origin.equals(rect.origin)
+            && this.width == rect.width
+            && this.height == rect.height
     }
 }

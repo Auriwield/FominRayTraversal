@@ -5,9 +5,9 @@ import {Listener} from "../listeners/Listener";
 
 export class Circle implements GraphicElement {
     private _center: Point;
-    private radius: number;
+    private _radius: number;
     private fillStyle: string;
-    private strokeStyle: string;
+    private _strokeStyle: string;
     private lineWidth: number;
 
     constructor(center: Point,
@@ -16,20 +16,20 @@ export class Circle implements GraphicElement {
                 strokeStyle = "#000",
                 lineWidth = 1) {
         this._center = center;
-        this.radius = radius;
+        this._radius = radius;
         this.fillStyle = fillStyle;
-        this.strokeStyle = strokeStyle;
+        this._strokeStyle = strokeStyle;
         this.lineWidth = lineWidth;
     }
 
     draw(canvas: Canvas): void {
         canvas.ctx.beginPath();
         canvas.ctx.arc(this.center.x, this.center.y,
-            this.radius, 0, 2 * Math.PI, false);
+            this._radius, 0, 2 * Math.PI, false);
         canvas.ctx.fillStyle = this.fillStyle;
         canvas.ctx.fill();
         canvas.ctx.lineWidth = this.lineWidth;
-        canvas.ctx.strokeStyle = this.strokeStyle;
+        canvas.ctx.strokeStyle = this._strokeStyle;
         canvas.ctx.stroke();
     }
 
@@ -38,7 +38,7 @@ export class Circle implements GraphicElement {
         let dx = point.x - this.center.x;
         let dy = point.y - this.center.y;
 
-        return dx * dx + dy * dy < this.radius * this.radius;
+        return dx * dx + dy * dy < this._radius * this._radius;
     }
 
     listeners(): Array<Listener> {
@@ -54,9 +54,13 @@ export class Circle implements GraphicElement {
         this._center.y = value.y;
     }
 
+    get radius(): number {
+        return this._radius;
+    }
+
     intersects(circle: Circle): boolean {
-        let rm = this.radius - circle.radius;
-        let rp = this.radius + circle.radius;
+        let rm = this._radius - circle._radius;
+        let rp = this._radius + circle._radius;
 
         let dx = this.center.x - circle.center.x;
         let dy = this.center.y - circle.center.y;
@@ -64,5 +68,9 @@ export class Circle implements GraphicElement {
         let d = dx * dx + dy * dy;
 
         return rm * rm <= d && d <= rp * rp;
+    }
+
+    set strokeStyle(value: string) {
+        this._strokeStyle = value;
     }
 }

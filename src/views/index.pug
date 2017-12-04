@@ -3,3 +3,14 @@ extends layout
 block content
   .center.full
     canvas#canvas
+  .config-pane
+    .container.align-middle
+      .row
+        .col-6
+          label.form-check-label
+            input#trace-circle-area.form-check-input(type="checkbox", value="")
+            | Show Trace Circle Area
+        .col-6
+          div.btn-group
+            button#add-circle-button.btn.btn-secondary.btn-sm(type='button') Add circle
+            button#remove-circle-button.btn.btn-secondary.btn-sm(type='button') Remove circle

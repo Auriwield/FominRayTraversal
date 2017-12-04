@@ -37,7 +37,12 @@ export class Point {
         return new Point(this.x - point.x, this.y - point.y);
     }
 
-    move(x : number, y : number) : Point {
+    move(x : number, y : number, applyOnThis : boolean = false) : Point {
+        if (applyOnThis) {
+            this.x += x;
+            this.y += y;
+            return this;
+        }
         return new Point(this.x + x, this.y + y);
     }
 }

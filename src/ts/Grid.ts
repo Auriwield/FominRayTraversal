@@ -8,26 +8,26 @@ import {Line} from "./primitives/Line";
 export class Grid implements GraphicElement {
     // amount of cells in cols and rows
     private size: number;
-    private width: number;
-    private height: number;
-    private rects: Rectangle[];
+    private _width: number;
+    private _height: number;
+    private _rects: Rectangle[];
     private lines: Line[];
 
     constructor(size: number, width: number, height: number) {
         this.size = size;
-        this.rects = [];
+        this._rects = [];
         this.lines = [];
 
-        this.width = width;
-        this.height = height;
+        this._width = width;
+        this._height = height;
 
-        let rectWidth = this.width / this.size;
-        let rectHeight = this.width / this.size;
+        let rectWidth = this._width / this.size;
+        let rectHeight = this._width / this.size;
 
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
                 let origin = new Point(rectWidth * j, rectHeight * i);
-                this.rects.push(new Rectangle(origin, rectWidth, rectHeight))
+                this._rects.push(new Rectangle(origin, rectWidth, rectHeight))
             }
         }
 
@@ -37,26 +37,36 @@ export class Grid implements GraphicElement {
         for (let i = 1; i < size; i++) {
             let height = rectHeight * i;
             let left = new Point(0, height);
-            let right = new Point(this.width, height);
+            let right = new Point(this._width, height);
             this.lines.push(new Line(left, right, lineWidth, lineColor));
         }
         
         for (let j = 1; j < size; j++) {
             let width = rectWidth * j;
             let left = new Point(width, 0);
-            let right = new Point(width, this.height);
+            let right = new Point(width, this._height);
             this.lines.push(new Line(left, right,  lineWidth, lineColor));
         }
     }
 
-    updateIntersection(line: Line) {
-        for (let rect of this.rects) {
-            rect.fillStyle = rect.intersects(line) ? "#ff5252" : "#ffffff"
+    updateIntersection(line: Line) : Rectangle[] {
+        let rects : Rectangle[] = [];
+        for (let rect of this._rects) {
+
+            let lineCrossesRect = rect.intersects(line);
+
+            if (lineCrossesRect) {
+                rects.push(rect)
+            }
+
+            rect.fillStyle = lineCrossesRect ? "#ff5252" : "#ffffff"
         }
+
+        return rects;
     }
 
     draw(canvas: Canvas): void {
-        for (let rect of this.rects) {
+        for (let rect of this._rects) {
             rect.draw(canvas);
         }
         for (let line of this.lines) {
@@ -70,5 +80,17 @@ export class Grid implements GraphicElement {
 
     listeners(): Listener[] {
         return [];
+    }
+
+    get rects(): Rectangle[] {
+        return this._rects;
+    }
+
+    get width(): number {
+        return this._width;
+    }
+
+    get height(): number {
+        return this._height;
     }
 }

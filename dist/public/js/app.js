@@ -98,7 +98,236 @@ var Canvas = exports.Canvas = function () {
     return Canvas;
 }();
 
-},{"./listeners/ListenerDelegate":5,"jquery":11}],2:[function(require,module,exports){
+},{"./listeners/ListenerDelegate":7,"jquery":13}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.CircleKeeper = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Circle = require("./primitives/Circle");
+
+var _Point = require("./primitives/Point");
+
+var _Config = require("./Config");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var CircleKeeper = exports.CircleKeeper = function () {
+    function CircleKeeper(grid, circlesAmount) {
+        _classCallCheck(this, CircleKeeper);
+
+        this.circlesAmount = 0;
+        this.circleRectRelation = [];
+        this.grid = grid;
+        for (var i = 0; i < circlesAmount; i++) {
+            this.addCircle();
+        }
+    }
+
+    _createClass(CircleKeeper, [{
+        key: "addCircle",
+        value: function addCircle() {
+            var r = 20 + Math.random() * 50;
+            var edgeCorrection = r + 10;
+            var x = edgeCorrection + Math.random() * (this.grid.width - edgeCorrection * 2);
+            var y = edgeCorrection + Math.random() * (this.grid.height - edgeCorrection * 2);
+            var circle = new _Circle.Circle(new _Point.Point(x, y), r, "rgba(255, 255, 255, 0.0)", "#000", 5);
+            var rects = [];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.grid.rects[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var rect = _step.value;
+
+                    if (rect.intersectsCircle(circle)) {
+                        rects.push(rect);
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            this.circleRectRelation.push([circle, rects]);
+            this.circlesAmount++;
+        }
+    }, {
+        key: "removeCircle",
+        value: function removeCircle() {
+            this.circleRectRelation.splice(0, 1);
+            this.circlesAmount--;
+        }
+    }, {
+        key: "draw",
+        value: function draw(canvas) {
+            for (var i = 0; i < this.circlesAmount; i++) {
+                var rel = this.circleRectRelation[i];
+                rel[0].draw(canvas);
+            }
+        }
+    }, {
+        key: "updateIntersection",
+        value: function updateIntersection(rects, line) {
+            var circles = this.getCirclesByRects(rects);
+            if (circles.length == 0) return;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = circles[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var circle = _step2.value;
+
+                    if (line.intersectsCircle(circle)) {
+                        circle.strokeStyle = "#ff6666";
+                    } else {
+                        circle.strokeStyle = "#000000";
+                    }
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+        }
+    }, {
+        key: "getCirclesByRects",
+        value: function getCirclesByRects(rects) {
+            var circles = [];
+            l: for (var i = 0; i < this.circlesAmount; i++) {
+                var rel = this.circleRectRelation[i];
+                var circle = rel[0];
+                var cRects = rel[1];
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
+
+                try {
+                    for (var _iterator3 = rects[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                        var rect = _step3.value;
+                        var _iteratorNormalCompletion4 = true;
+                        var _didIteratorError4 = false;
+                        var _iteratorError4 = undefined;
+
+                        try {
+                            for (var _iterator4 = cRects[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                                var crect = _step4.value;
+
+                                if (rect.equals(crect)) {
+                                    circles.push(circle);
+                                    if (_Config.Config.traceCircleArea) {
+                                        var _iteratorNormalCompletion5 = true;
+                                        var _didIteratorError5 = false;
+                                        var _iteratorError5 = undefined;
+
+                                        try {
+                                            for (var _iterator5 = cRects[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                                                var r = _step5.value;
+
+                                                r.fillStyle = "green";
+                                            }
+                                        } catch (err) {
+                                            _didIteratorError5 = true;
+                                            _iteratorError5 = err;
+                                        } finally {
+                                            try {
+                                                if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                                                    _iterator5.return();
+                                                }
+                                            } finally {
+                                                if (_didIteratorError5) {
+                                                    throw _iteratorError5;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    continue l;
+                                }
+                            }
+                        } catch (err) {
+                            _didIteratorError4 = true;
+                            _iteratorError4 = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                    _iterator4.return();
+                                }
+                            } finally {
+                                if (_didIteratorError4) {
+                                    throw _iteratorError4;
+                                }
+                            }
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError3 = true;
+                    _iteratorError3 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                            _iterator3.return();
+                        }
+                    } finally {
+                        if (_didIteratorError3) {
+                            throw _iteratorError3;
+                        }
+                    }
+                }
+            }
+            return circles;
+        }
+    }, {
+        key: "containsPoint",
+        value: function containsPoint(point) {
+            return null;
+        }
+    }, {
+        key: "listeners",
+        value: function listeners() {
+            return [];
+        }
+    }]);
+
+    return CircleKeeper;
+}();
+
+},{"./Config":3,"./primitives/Circle":9,"./primitives/Point":11}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var Config = {
+    "traceCircleArea": false
+};
+exports.Config = Config;
+
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -121,16 +350,16 @@ var Grid = exports.Grid = function () {
         _classCallCheck(this, Grid);
 
         this.size = size;
-        this.rects = [];
+        this._rects = [];
         this.lines = [];
-        this.width = width;
-        this.height = height;
-        var rectWidth = this.width / this.size;
-        var rectHeight = this.width / this.size;
+        this._width = width;
+        this._height = height;
+        var rectWidth = this._width / this.size;
+        var rectHeight = this._width / this.size;
         for (var i = 0; i < size; i++) {
             for (var j = 0; j < size; j++) {
                 var origin = new _Point.Point(rectWidth * j, rectHeight * i);
-                this.rects.push(new _Rectangle.Rectangle(origin, rectWidth, rectHeight));
+                this._rects.push(new _Rectangle.Rectangle(origin, rectWidth, rectHeight));
             }
         }
         var lineWidth = 1;
@@ -138,13 +367,13 @@ var Grid = exports.Grid = function () {
         for (var _i = 1; _i < size; _i++) {
             var _height = rectHeight * _i;
             var left = new _Point.Point(0, _height);
-            var right = new _Point.Point(this.width, _height);
+            var right = new _Point.Point(this._width, _height);
             this.lines.push(new _Line.Line(left, right, lineWidth, lineColor));
         }
         for (var _j = 1; _j < size; _j++) {
             var _width = rectWidth * _j;
             var _left = new _Point.Point(_width, 0);
-            var _right = new _Point.Point(_width, this.height);
+            var _right = new _Point.Point(_width, this._height);
             this.lines.push(new _Line.Line(_left, _right, lineWidth, lineColor));
         }
     }
@@ -152,15 +381,20 @@ var Grid = exports.Grid = function () {
     _createClass(Grid, [{
         key: "updateIntersection",
         value: function updateIntersection(line) {
+            var rects = [];
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
 
             try {
-                for (var _iterator = this.rects[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                for (var _iterator = this._rects[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var rect = _step.value;
 
-                    rect.fillStyle = rect.intersects(line) ? "#ff5252" : "#ffffff";
+                    var lineCrossesRect = rect.intersects(line);
+                    if (lineCrossesRect) {
+                        rects.push(rect);
+                    }
+                    rect.fillStyle = lineCrossesRect ? "#ff5252" : "#ffffff";
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -176,6 +410,8 @@ var Grid = exports.Grid = function () {
                     }
                 }
             }
+
+            return rects;
         }
     }, {
         key: "draw",
@@ -185,7 +421,7 @@ var Grid = exports.Grid = function () {
             var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator2 = this.rects[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                for (var _iterator2 = this._rects[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var rect = _step2.value;
 
                     rect.draw(canvas);
@@ -240,12 +476,27 @@ var Grid = exports.Grid = function () {
         value: function listeners() {
             return [];
         }
+    }, {
+        key: "rects",
+        get: function get() {
+            return this._rects;
+        }
+    }, {
+        key: "width",
+        get: function get() {
+            return this._width;
+        }
+    }, {
+        key: "height",
+        get: function get() {
+            return this._height;
+        }
     }]);
 
     return Grid;
 }();
 
-},{"./primitives/Line":8,"./primitives/Point":9,"./primitives/Rectangle":10}],3:[function(require,module,exports){
+},{"./primitives/Line":10,"./primitives/Point":11,"./primitives/Rectangle":12}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -269,6 +520,7 @@ var MovableLine = exports.MovableLine = function () {
 
         this.line = line;
         this.canvas = canvas;
+        this.callbacks = [];
         this.edgeRadius = 20;
         this.leftEdge = new _Circle.Circle(line.left, this.edgeRadius);
         this.rightEdge = new _Circle.Circle(line.right, this.edgeRadius);
@@ -294,16 +546,25 @@ var MovableLine = exports.MovableLine = function () {
             var onDragLeftListener = new _OnDragListener.OnDragListener(this.leftEdge, function (event, canvas) {
                 _this.leftEdge.center = event.point;
                 _this.checkPoint(_this.leftEdge.center);
-                if (_this._onUpdate) _this._onUpdate(_this.line);
+                _this.callCallbacks();
                 canvas.refresh();
             });
             var onDragRightListener = new _OnDragListener.OnDragListener(this.rightEdge, function (event, canvas) {
                 _this.rightEdge.center = event.point;
                 _this.checkPoint(_this.rightEdge.center);
-                if (_this._onUpdate) _this._onUpdate(_this.line);
+                _this.callCallbacks();
                 canvas.refresh();
             });
             return onDragLeftListener.listen().concat(onDragRightListener.listen());
+        }
+    }, {
+        key: "callCallbacks",
+        value: function callCallbacks() {
+            var _this2 = this;
+
+            this.callbacks.forEach(function (callback) {
+                return callback(_this2.line);
+            });
         }
         // p1 - left top corner
 
@@ -317,22 +578,38 @@ var MovableLine = exports.MovableLine = function () {
             if (p.y < p1.y) p.y = p1.y;
             if (p.x > p2.x) p.x = p2.x;
             if (p.y > p2.y) p.y = p2.y;
+            var lc = this.leftEdge.center;
+            var rc = this.rightEdge.center;
             if (this.leftEdge.intersects(this.rightEdge)) {
-                // todo
+                var dx = lc.x - rc.x;
+                var dy = lc.y - rc.y;
+                var l = Math.sqrt(dx * dx + dy * dy);
+                var d = this.edgeRadius * 2 - l;
+                var rd = d / l;
+                dx *= rd;
+                dy *= rd;
+                if (p.equals(lc)) {
+                    lc.move(dx, dy, true);
+                } else if (p.equals(rc)) {
+                    dx *= -1;
+                    dy *= -1;
+                    rc.move(dx, dy, true);
+                }
             }
         }
     }, {
-        key: "onUpdate",
-        set: function set(value) {
-            this._onUpdate = value;
-            if (this._onUpdate) this._onUpdate(this.line);
+        key: "addCallback",
+        value: function addCallback(callback) {
+            if (!callback) return;
+            this.callbacks.push(callback);
+            callback(this.line);
         }
     }]);
 
     return MovableLine;
 }();
 
-},{"./listeners/OnDragListener":6,"./primitives/Circle":7,"./primitives/Point":9}],4:[function(require,module,exports){
+},{"./listeners/OnDragListener":8,"./primitives/Circle":9,"./primitives/Point":11}],6:[function(require,module,exports){
 "use strict";
 
 var _jquery = require("jquery");
@@ -349,6 +626,10 @@ var _MovableLine = require("./MovableLine");
 
 var _Grid = require("./Grid");
 
+var _CircleKeeper = require("./CircleKeeper");
+
+var _Config = require("./Config");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 (0, _jquery2.default)(function () {
@@ -364,14 +645,34 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     var rightPoint = new _Point.Point(500, 500);
     var line = new _Line.Line(leftPoint, rightPoint);
     var movableLine = new _MovableLine.MovableLine(line, canvas);
-    movableLine.onUpdate = function (line) {
-        return grid.updateIntersection(line);
-    };
+    var circleKeeper = new _CircleKeeper.CircleKeeper(grid, 0);
+    movableLine.addCallback(function (line) {
+        var rects = grid.updateIntersection(line);
+        circleKeeper.updateIntersection(rects, line);
+    });
     canvas.addElement(movableLine);
+    canvas.addElement(circleKeeper);
     canvas.refresh();
+    (0, _jquery2.default)("#trace-circle-area").change(function (evt) {
+        var e = evt;
+        _Config.Config.traceCircleArea = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+    (0, _jquery2.default)("#add-circle-button").click(function () {
+        circleKeeper.addCircle();
+        movableLine.callCallbacks();
+        canvas.refresh();
+        ç;
+    });
+    (0, _jquery2.default)("#remove-circle-button").click(function () {
+        circleKeeper.removeCircle();
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
 });
 
-},{"./Canvas":1,"./Grid":2,"./MovableLine":3,"./primitives/Line":8,"./primitives/Point":9,"jquery":11}],5:[function(require,module,exports){
+},{"./Canvas":1,"./CircleKeeper":2,"./Config":3,"./Grid":4,"./MovableLine":5,"./primitives/Line":10,"./primitives/Point":11,"jquery":13}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -461,7 +762,7 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
     return ListenerDelegate;
 }();
 
-},{"../primitives/Point":9}],6:[function(require,module,exports){
+},{"../primitives/Point":11}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -532,7 +833,7 @@ var OnDragListener = exports.OnDragListener = function () {
     return OnDragListener;
 }();
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -552,9 +853,9 @@ var Circle = exports.Circle = function () {
         _classCallCheck(this, Circle);
 
         this._center = center;
-        this.radius = radius;
+        this._radius = radius;
         this.fillStyle = fillStyle;
-        this.strokeStyle = strokeStyle;
+        this._strokeStyle = strokeStyle;
         this.lineWidth = lineWidth;
     }
 
@@ -562,11 +863,11 @@ var Circle = exports.Circle = function () {
         key: "draw",
         value: function draw(canvas) {
             canvas.ctx.beginPath();
-            canvas.ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI, false);
+            canvas.ctx.arc(this.center.x, this.center.y, this._radius, 0, 2 * Math.PI, false);
             canvas.ctx.fillStyle = this.fillStyle;
             canvas.ctx.fill();
             canvas.ctx.lineWidth = this.lineWidth;
-            canvas.ctx.strokeStyle = this.strokeStyle;
+            canvas.ctx.strokeStyle = this._strokeStyle;
             canvas.ctx.stroke();
         }
     }, {
@@ -574,7 +875,7 @@ var Circle = exports.Circle = function () {
         value: function containsPoint(point) {
             var dx = point.x - this.center.x;
             var dy = point.y - this.center.y;
-            return dx * dx + dy * dy < this.radius * this.radius;
+            return dx * dx + dy * dy < this._radius * this._radius;
         }
     }, {
         key: "listeners",
@@ -584,8 +885,8 @@ var Circle = exports.Circle = function () {
     }, {
         key: "intersects",
         value: function intersects(circle) {
-            var rm = this.radius - circle.radius;
-            var rp = this.radius + circle.radius;
+            var rm = this._radius - circle._radius;
+            var rp = this._radius + circle._radius;
             var dx = this.center.x - circle.center.x;
             var dy = this.center.y - circle.center.y;
             var d = dx * dx + dy * dy;
@@ -600,12 +901,22 @@ var Circle = exports.Circle = function () {
             this._center.x = value.x;
             this._center.y = value.y;
         }
+    }, {
+        key: "radius",
+        get: function get() {
+            return this._radius;
+        }
+    }, {
+        key: "strokeStyle",
+        set: function set(value) {
+            this._strokeStyle = value;
+        }
     }]);
 
     return Circle;
 }();
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -676,6 +987,50 @@ var Line = exports.Line = function () {
             var s = q / d;
             return !(r < 0 || r > 1 || s < 0 || s > 1);
         }
+        /*
+            Dx = Bx-Ax;
+            Dy = By-Ay;
+             LAB = (Dx^2 + Dy^2);
+            t = ((Cx - Ax) * Dx + (Cy - Ay) * Dy) / LAB;
+             if t > 1
+                t=1;
+            elseif t<0
+                t=0;
+            end;
+              nearestX = Ax + t * Dx;
+            nearestY = Ay + t * Dy;
+             dist = sqrt( (nearestX-Cx)^2 + (nearestY-Cy)^2 );
+             if (dist > R )
+             flag=0;
+            else
+             flag=1;
+            end
+          */
+
+    }, {
+        key: "intersectsCircle",
+        value: function intersectsCircle(circle) {
+            var ax = this.left.x;
+            var bx = this.right.x;
+            var ay = this.left.y;
+            var by = this.right.y;
+            var cx = circle.center.x;
+            var cy = circle.center.y;
+            var r = circle.radius;
+            var dx = bx - ax;
+            var dy = by - ay;
+            var lab = Math.pow(dx, 2) + Math.pow(dy, 2);
+            var t = ((cx - ax) * dx + (cy - ay) * dy) / lab;
+            if (t > 1) {
+                t = 1;
+            } else if (t < 0) {
+                t = 0;
+            }
+            var nearestX = ax + t * dx;
+            var nearestY = ay + t * dy;
+            var dist = Math.sqrt(Math.pow(nearestX - cx, 2) + Math.pow(nearestY - cy, 2));
+            return dist <= r;
+        }
     }, {
         key: "left",
         get: function get() {
@@ -699,7 +1054,7 @@ var Line = exports.Line = function () {
     return Line;
 }();
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -736,6 +1091,13 @@ var Point = exports.Point = function () {
     }, {
         key: "move",
         value: function move(x, y) {
+            var applyOnThis = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+            if (applyOnThis) {
+                this.x += x;
+                this.y += y;
+                return this;
+            }
             return new Point(this.x + x, this.y + y);
         }
     }, {
@@ -759,7 +1121,7 @@ var Point = exports.Point = function () {
     return Point;
 }();
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -812,6 +1174,21 @@ var Rectangle = exports.Rectangle = function () {
             if (this.containsPoint(line.left) || this.containsPoint(line.right)) {
                 return true;
             }
+            var sides = this.sides();
+            return line.intersects(sides.top) || line.intersects(sides.left) || line.intersects(sides.right) || line.intersects(sides.bottom);
+        }
+    }, {
+        key: "intersectsCircle",
+        value: function intersectsCircle(circle) {
+            if (this.containsPoint(circle.center)) {
+                return true;
+            }
+            var sides = this.sides();
+            return sides.top.intersectsCircle(circle) || sides.left.intersectsCircle(circle) || sides.right.intersectsCircle(circle) || sides.bottom.intersectsCircle(circle);
+        }
+    }, {
+        key: "sides",
+        value: function sides() {
             var topLeft = this.origin;
             var topRight = this.origin.move(this.width, 0);
             var bottomLeft = this.origin.move(0, this.height);
@@ -820,7 +1197,12 @@ var Rectangle = exports.Rectangle = function () {
             var left = new _Line.Line(topLeft, bottomLeft);
             var right = new _Line.Line(topRight, bottomRight);
             var bottom = new _Line.Line(bottomLeft, bottomRight);
-            return line.intersects(top) || line.intersects(left) || line.intersects(right) || line.intersects(bottom);
+            return { top: top, left: left, right: right, bottom: bottom };
+        }
+    }, {
+        key: "equals",
+        value: function equals(rect) {
+            return this.origin.equals(rect.origin) && this.width == rect.width && this.height == rect.height;
         }
     }, {
         key: "fillStyle",
@@ -832,7 +1214,7 @@ var Rectangle = exports.Rectangle = function () {
     return Rectangle;
 }();
 
-},{"./Line":8}],11:[function(require,module,exports){
+},{"./Line":10}],13:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -11087,4 +11469,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[4]);
+},{}]},{},[6]);

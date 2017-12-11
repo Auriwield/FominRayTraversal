@@ -41,8 +41,8 @@ export class Circle implements GraphicElement {
         return dx * dx + dy * dy < this._radius * this._radius;
     }
 
-    listeners(): Array<Listener> {
-        return null;
+    listeners(): Listener[] {
+        return [];
     }
 
     get center(): Point {

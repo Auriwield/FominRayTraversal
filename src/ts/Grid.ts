@@ -3,7 +3,7 @@ import {Point} from "./primitives/Point";
 import {GraphicElement} from "./primitives/GraphicElement";
 import {Canvas} from "./Canvas";
 import {Listener} from "./listeners/Listener";
-import {Line} from "./primitives/Line";
+import {Line} from "./primitives/Segment";
 import {Config} from "./Config";
 
 export class Grid implements GraphicElement {
@@ -60,7 +60,7 @@ export class Grid implements GraphicElement {
                 rects.push(rect)
             }
 
-            rect.fillStyle = Config.lineTraversal && lineCrossesRect ? "#F44336" : "#ffffff"
+            rect.fillStyle = Config.lineTraversal && lineCrossesRect ? Config.red : Config.white
         }
 
         return rects;

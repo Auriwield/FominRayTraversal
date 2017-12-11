@@ -138,8 +138,8 @@ export class Line implements GraphicElement {
         let nearestX = ax + t * dx;
         let nearestY = ay + t * dy;
 
-        let dist = Math.sqrt( (nearestX-cx)**2 + (nearestY-cy)**2 );
+        let dist = (nearestX-cx)**2 + (nearestY-cy)**2 ;
 
-        return dist <= r;
+        return dist <= r ** 2;
     }
 }

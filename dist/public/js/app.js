@@ -98,7 +98,7 @@ var Canvas = exports.Canvas = function () {
     return Canvas;
 }();
 
-},{"./listeners/ListenerDelegate":7,"jquery":13}],2:[function(require,module,exports){
+},{"./listeners/ListenerDelegate":8,"jquery":14}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -108,11 +108,11 @@ exports.CircleKeeper = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Circle = require("./primitives/Circle");
-
 var _Point = require("./primitives/Point");
 
 var _Config = require("./Config");
+
+var _MovableCircle = require("./MovableCircle");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -131,11 +131,25 @@ var CircleKeeper = exports.CircleKeeper = function () {
     _createClass(CircleKeeper, [{
         key: "addCircle",
         value: function addCircle() {
+            var _this = this;
+
             var r = 20 + Math.random() * 50;
             var edgeCorrection = r + 10;
             var x = edgeCorrection + Math.random() * (this.grid.width - edgeCorrection * 2);
             var y = edgeCorrection + Math.random() * (this.grid.height - edgeCorrection * 2);
-            var circle = new _Circle.Circle(new _Point.Point(x, y), r, "rgba(255, 255, 255, 0.0)", "#000", 5);
+            var circle = new _MovableCircle.MovableCircle(new _Point.Point(x, y), r, "rgba(255, 255, 255, 0.0)", "#000", 5);
+            var rects = this.getRectsIntersectCircle(circle);
+            var rel = [circle, rects];
+            circle.onCircleMoved = function () {
+                rel[1] = _this.getRectsIntersectCircle(circle);
+                _this.onCircleMoved();
+            };
+            this.circleRectRelation.push(rel);
+            this.circlesAmount++;
+        }
+    }, {
+        key: "getRectsIntersectCircle",
+        value: function getRectsIntersectCircle(circle) {
             var rects = [];
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -164,8 +178,7 @@ var CircleKeeper = exports.CircleKeeper = function () {
                 }
             }
 
-            this.circleRectRelation.push([circle, rects]);
-            this.circlesAmount++;
+            return rects;
         }
     }, {
         key: "removeCircle",
@@ -189,33 +202,62 @@ var CircleKeeper = exports.CircleKeeper = function () {
                 this.circleRectRelation[i][0].fillStyle = "rgba(0,0,0,0)";
                 this.circleRectRelation[i][0].lineWidth = 2;
             }
+            if (_Config.Config.allCircleTraversal) {
+                for (var _i = 0; _i < this.circlesAmount; _i++) {
+                    var _rects = this.circleRectRelation[_i][1];
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
+
+                    try {
+                        for (var _iterator2 = _rects[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var rect = _step2.value;
+
+                            rect.fillStyle = _Config.Config.green;
+                        }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
+                }
+            }
             var circles = this.getCirclesByRects(rects);
             if (circles.length == 0) return;
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
 
             try {
-                for (var _iterator2 = circles[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var circle = _step2.value;
+                for (var _iterator3 = circles[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var circle = _step3.value;
 
                     if (line.intersectsCircle(circle)) {
-                        circle.strokeStyle = "#9E9E9E";
-                        circle.fillStyle = "#fff";
-                        circle.lineWidth = 15;
+                        //circle.strokeStyle = "#9E9E9E";
+                        circle.fillStyle = "rgba(30,30,30,0.5)";
+                        circle.lineWidth = 2;
                     }
                 }
             } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
                     }
                 } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
                     }
                 }
             }
@@ -228,45 +270,46 @@ var CircleKeeper = exports.CircleKeeper = function () {
                 var rel = this.circleRectRelation[i];
                 var circle = rel[0];
                 var cRects = rel[1];
-                var _iteratorNormalCompletion3 = true;
-                var _didIteratorError3 = false;
-                var _iteratorError3 = undefined;
+                var _iteratorNormalCompletion4 = true;
+                var _didIteratorError4 = false;
+                var _iteratorError4 = undefined;
 
                 try {
-                    for (var _iterator3 = rects[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                        var rect = _step3.value;
-                        var _iteratorNormalCompletion4 = true;
-                        var _didIteratorError4 = false;
-                        var _iteratorError4 = undefined;
+                    for (var _iterator4 = rects[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                        var rect = _step4.value;
+                        var _iteratorNormalCompletion5 = true;
+                        var _didIteratorError5 = false;
+                        var _iteratorError5 = undefined;
 
                         try {
-                            for (var _iterator4 = cRects[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                                var crect = _step4.value;
+                            for (var _iterator5 = cRects[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                                var crect = _step5.value;
 
                                 if (rect.equals(crect)) {
                                     circles.push(circle);
                                     if (_Config.Config.circleTraversal) {
-                                        var _iteratorNormalCompletion5 = true;
-                                        var _didIteratorError5 = false;
-                                        var _iteratorError5 = undefined;
+                                        var _iteratorNormalCompletion6 = true;
+                                        var _didIteratorError6 = false;
+                                        var _iteratorError6 = undefined;
 
                                         try {
-                                            for (var _iterator5 = cRects[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                                                var r = _step5.value;
+                                            for (var _iterator6 = cRects[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                                                var r = _step6.value;
 
-                                                r.fillStyle = "#4CAF50";
+                                                //r.fillStyle = "rgba(76,175,80,0.7)"
+                                                r.fillStyle = _Config.Config.green;
                                             }
                                         } catch (err) {
-                                            _didIteratorError5 = true;
-                                            _iteratorError5 = err;
+                                            _didIteratorError6 = true;
+                                            _iteratorError6 = err;
                                         } finally {
                                             try {
-                                                if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                                                    _iterator5.return();
+                                                if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                                                    _iterator6.return();
                                                 }
                                             } finally {
-                                                if (_didIteratorError5) {
-                                                    throw _iteratorError5;
+                                                if (_didIteratorError6) {
+                                                    throw _iteratorError6;
                                                 }
                                             }
                                         }
@@ -275,31 +318,31 @@ var CircleKeeper = exports.CircleKeeper = function () {
                                 }
                             }
                         } catch (err) {
-                            _didIteratorError4 = true;
-                            _iteratorError4 = err;
+                            _didIteratorError5 = true;
+                            _iteratorError5 = err;
                         } finally {
                             try {
-                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                    _iterator4.return();
+                                if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                                    _iterator5.return();
                                 }
                             } finally {
-                                if (_didIteratorError4) {
-                                    throw _iteratorError4;
+                                if (_didIteratorError5) {
+                                    throw _iteratorError5;
                                 }
                             }
                         }
                     }
                 } catch (err) {
-                    _didIteratorError3 = true;
-                    _iteratorError3 = err;
+                    _didIteratorError4 = true;
+                    _iteratorError4 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                            _iterator3.return();
+                        if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                            _iterator4.return();
                         }
                     } finally {
-                        if (_didIteratorError3) {
-                            throw _iteratorError3;
+                        if (_didIteratorError4) {
+                            throw _iteratorError4;
                         }
                     }
                 }
@@ -314,14 +357,20 @@ var CircleKeeper = exports.CircleKeeper = function () {
     }, {
         key: "listeners",
         value: function listeners() {
-            return [];
+            var listeners = [];
+            for (var i = 0; i < this.circlesAmount; i++) {
+                var rel = this.circleRectRelation[i];
+                var circle = rel[0];
+                listeners = listeners.concat(circle.listeners());
+            }
+            return listeners;
         }
     }]);
 
     return CircleKeeper;
 }();
 
-},{"./Config":3,"./primitives/Circle":9,"./primitives/Point":11}],3:[function(require,module,exports){
+},{"./Config":3,"./MovableCircle":5,"./primitives/Point":11}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -329,8 +378,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 var Config = {
     "circleTraversal": false,
+    "allCircleTraversal": false,
     "showGrid": true,
-    "lineTraversal": true
+    "lineTraversal": true,
+    "white": "#ffffff",
+    "red": "#F44336",
+    "green": "#4CAF50",
+    "brown": "#CA5D3C"
 };
 exports.Config = Config;
 
@@ -348,7 +402,7 @@ var _Rectangle = require("./primitives/Rectangle");
 
 var _Point = require("./primitives/Point");
 
-var _Line = require("./primitives/Line");
+var _Segment = require("./primitives/Segment");
 
 var _Config = require("./Config");
 
@@ -377,13 +431,13 @@ var Grid = exports.Grid = function () {
             var _height = rectHeight * _i;
             var left = new _Point.Point(0, _height);
             var right = new _Point.Point(this._width, _height);
-            this.lines.push(new _Line.Line(left, right, lineWidth, lineColor));
+            this.lines.push(new _Segment.Line(left, right, lineWidth, lineColor));
         }
         for (var _j = 1; _j < size; _j++) {
             var _width = rectWidth * _j;
             var _left = new _Point.Point(_width, 0);
             var _right = new _Point.Point(_width, this._height);
-            this.lines.push(new _Line.Line(_left, _right, lineWidth, lineColor));
+            this.lines.push(new _Segment.Line(_left, _right, lineWidth, lineColor));
         }
     }
 
@@ -403,7 +457,7 @@ var Grid = exports.Grid = function () {
                     if (lineCrossesRect) {
                         rects.push(rect);
                     }
-                    rect.fillStyle = _Config.Config.lineTraversal && lineCrossesRect ? "#F44336" : "#ffffff";
+                    rect.fillStyle = _Config.Config.lineTraversal && lineCrossesRect ? _Config.Config.red : _Config.Config.white;
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -506,7 +560,67 @@ var Grid = exports.Grid = function () {
     return Grid;
 }();
 
-},{"./Config":3,"./primitives/Line":10,"./primitives/Point":11,"./primitives/Rectangle":12}],5:[function(require,module,exports){
+},{"./Config":3,"./primitives/Point":11,"./primitives/Rectangle":12,"./primitives/Segment":13}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.MovableCircle = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Circle2 = require("./primitives/Circle");
+
+var _OnDragListener = require("./listeners/OnDragListener");
+
+var _Point = require("./primitives/Point");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MovableCircle = exports.MovableCircle = function (_Circle) {
+    _inherits(MovableCircle, _Circle);
+
+    function MovableCircle() {
+        _classCallCheck(this, MovableCircle);
+
+        return _possibleConstructorReturn(this, (MovableCircle.__proto__ || Object.getPrototypeOf(MovableCircle)).apply(this, arguments));
+    }
+
+    _createClass(MovableCircle, [{
+        key: "listeners",
+        value: function listeners() {
+            var _this2 = this;
+
+            var onListener = new _OnDragListener.OnDragListener(this, function (event, canvas) {
+                _this2.center = event.point;
+                _this2.checkPoint(_this2.center, canvas);
+                if (_this2.onCircleMoved) _this2.onCircleMoved();
+                canvas.refresh();
+            });
+            return onListener.listen();
+        }
+    }, {
+        key: "checkPoint",
+        value: function checkPoint(p, canvas) {
+            var r = this.radius;
+            var p1 = new _Point.Point(r, r);
+            var p2 = new _Point.Point(p1.x + canvas.width - r * 2, p1.y + canvas.height - r * 2);
+            if (p.x < p1.x) p.x = p1.x;
+            if (p.y < p1.y) p.y = p1.y;
+            if (p.x > p2.x) p.x = p2.x;
+            if (p.y > p2.y) p.y = p2.y;
+        }
+    }]);
+
+    return MovableCircle;
+}(_Circle2.Circle);
+
+},{"./listeners/OnDragListener":9,"./primitives/Circle":10,"./primitives/Point":11}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -516,7 +630,7 @@ exports.MovableLine = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Line = require("./primitives/Line");
+var _Segment = require("./primitives/Segment");
 
 var _Circle = require("./primitives/Circle");
 
@@ -530,12 +644,12 @@ var MovableLine = exports.MovableLine = function () {
     function MovableLine(canvas) {
         _classCallCheck(this, MovableLine);
 
-        this.line = new _Line.Line(new _Point.Point(100, 100), new _Point.Point(500, 500), 12, "#212121");
+        this.line = new _Segment.Line(new _Point.Point(100, 100), new _Point.Point(500, 500), 2, "#212121");
         this.canvas = canvas;
         this.callbacks = [];
         this.edgeRadius = 24;
-        this.leftEdge = new _Circle.Circle(this.line.left, this.edgeRadius, "#fff", "#212121", 10);
-        this.rightEdge = new _Circle.Circle(this.line.right, this.edgeRadius, "#fff", "#212121", 10);
+        this.leftEdge = new _Circle.Circle(this.line.left, this.edgeRadius, "#fff", "#212121");
+        this.rightEdge = new _Circle.Circle(this.line.right, this.edgeRadius, "#fff", "#212121");
     }
 
     _createClass(MovableLine, [{
@@ -621,7 +735,7 @@ var MovableLine = exports.MovableLine = function () {
     return MovableLine;
 }();
 
-},{"./listeners/OnDragListener":8,"./primitives/Circle":9,"./primitives/Line":10,"./primitives/Point":11}],6:[function(require,module,exports){
+},{"./listeners/OnDragListener":9,"./primitives/Circle":10,"./primitives/Point":11,"./primitives/Segment":13}],7:[function(require,module,exports){
 "use strict";
 
 var _jquery = require("jquery");
@@ -655,12 +769,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
         var rects = grid.updateIntersection(line);
         circleKeeper.updateIntersection(rects, line);
     });
+    circleKeeper.onCircleMoved = function () {
+        return movableLine.callCallbacks();
+    };
     canvas.addElement(circleKeeper);
     canvas.addElement(movableLine);
     canvas.refresh();
     (0, _jquery2.default)("#trace-circle-area").change(function (evt) {
         var e = evt;
         _Config.Config.circleTraversal = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+    (0, _jquery2.default)("#trace-all-circle-area").change(function (evt) {
+        var e = evt;
+        _Config.Config.allCircleTraversal = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });
@@ -688,7 +811,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     });
 });
 
-},{"./Canvas":1,"./CircleKeeper":2,"./Config":3,"./Grid":4,"./MovableLine":5,"jquery":13}],7:[function(require,module,exports){
+},{"./Canvas":1,"./CircleKeeper":2,"./Config":3,"./Grid":4,"./MovableLine":6,"jquery":14}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -715,7 +838,7 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
     _createClass(ListenerDelegate, [{
         key: "addListeners",
         value: function addListeners(listeners) {
-            this.listeners = this.listeners.concat(listeners);
+            this.listeners = listeners.concat(this.listeners);
             this.registerEvents(listeners);
         }
     }, {
@@ -734,13 +857,43 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
                     if (!listeners || listeners.length == 0) {
                         _this.element.removeEventListener(value.name, null, false);
                     }
-                    listeners.forEach(function (listener) {
-                        var event = {
-                            point: _this.getPointFromEvent(evt),
-                            data: evt
-                        };
-                        listener.onAction(event, _this.canvas);
-                    });
+                    var event = {
+                        point: _this.getPointFromEvent(evt),
+                        data: evt
+                    };
+                    var _iteratorNormalCompletion = true;
+                    var _didIteratorError = false;
+                    var _iteratorError = undefined;
+
+                    try {
+                        for (var _iterator = listeners[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                            var listener = _step.value;
+
+                            var ge = listener.element;
+                            if (ge.containsPoint) {
+                                if (!ge.containsPoint(event.point)) {
+                                    continue;
+                                }
+                            }
+                            listener.onAction(event, _this.canvas);
+                            if (!listener.propagation) {
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError = true;
+                        _iteratorError = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion && _iterator.return) {
+                                _iterator.return();
+                            }
+                        } finally {
+                            if (_didIteratorError) {
+                                throw _iteratorError;
+                            }
+                        }
+                    }
                 });
                 _this.registeredEvents.push(value.name);
             });
@@ -766,11 +919,33 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
         key: "getListenersByEvent",
         value: function getListenersByEvent(event) {
             var listeners = [];
-            this.listeners.forEach(function (value) {
-                if (value.name === event) {
-                    listeners.push(value);
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = this.listeners[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var listener = _step2.value;
+
+                    if (listener.name === event) {
+                        listeners.push(listener);
+                    }
                 }
-            });
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
             return listeners;
         }
     }]);
@@ -778,7 +953,7 @@ var ListenerDelegate = exports.ListenerDelegate = function () {
     return ListenerDelegate;
 }();
 
-},{"../primitives/Point":11}],8:[function(require,module,exports){
+},{"../primitives/Point":11}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -794,6 +969,7 @@ var OnDragListener = exports.OnDragListener = function () {
         _classCallCheck(this, OnDragListener);
 
         this.name = "onDragListener";
+        this.propagation = false;
         this.downPoint = null;
         this.lastEventPoint = null;
         this.element = element;
@@ -809,6 +985,7 @@ var OnDragListener = exports.OnDragListener = function () {
             listeners.push({
                 name: "mousedown",
                 element: this.element,
+                propagation: false,
                 onAction: function onAction(event) {
                     if (_this.element.containsPoint(event.point)) {
                         _this.downPoint = event.point;
@@ -818,6 +995,7 @@ var OnDragListener = exports.OnDragListener = function () {
             listeners.push({
                 name: "mouseup",
                 element: document.body,
+                propagation: true,
                 onAction: function onAction() {
                     _this.downPoint = null;
                 }
@@ -826,6 +1004,7 @@ var OnDragListener = exports.OnDragListener = function () {
             listeners.push({
                 name: "mousemove",
                 element: document.body,
+                propagation: true,
                 onAction: function onAction(event, canvas) {
                     if (_this.downPoint) {
                         //let delta = event.point.delta(this.downPoint);
@@ -849,7 +1028,7 @@ var OnDragListener = exports.OnDragListener = function () {
     return OnDragListener;
 }();
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -896,7 +1075,7 @@ var Circle = exports.Circle = function () {
     }, {
         key: "listeners",
         value: function listeners() {
-            return null;
+            return [];
         }
     }, {
         key: "intersects",
@@ -942,7 +1121,175 @@ var Circle = exports.Circle = function () {
     return Circle;
 }();
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Point = exports.Point = function () {
+    function Point(x, y) {
+        _classCallCheck(this, Point);
+
+        this._x = x;
+        this._y = y;
+    }
+
+    _createClass(Point, [{
+        key: "equals",
+        value: function equals(point) {
+            return point != null && this.x === point.x && this.y === point.y;
+        }
+    }, {
+        key: "toString",
+        value: function toString() {
+            return "x: " + this.x + " y: " + this.y;
+        }
+    }, {
+        key: "delta",
+        value: function delta(point) {
+            return new Point(this.x - point.x, this.y - point.y);
+        }
+    }, {
+        key: "move",
+        value: function move(x, y) {
+            var applyOnThis = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+            if (applyOnThis) {
+                this.x += x;
+                this.y += y;
+                return this;
+            }
+            return new Point(this.x + x, this.y + y);
+        }
+    }, {
+        key: "x",
+        get: function get() {
+            return this._x;
+        },
+        set: function set(value) {
+            this._x = value;
+        }
+    }, {
+        key: "y",
+        get: function get() {
+            return this._y;
+        },
+        set: function set(value) {
+            this._y = value;
+        }
+    }]);
+
+    return Point;
+}();
+
+},{}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Rectangle = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Segment = require("./Segment");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Rectangle = exports.Rectangle = function () {
+    function Rectangle(origin, width, height) {
+        var strokeColor = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "#ffffff";
+        var fillColor = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "#ffffff";
+
+        _classCallCheck(this, Rectangle);
+
+        this.origin = origin;
+        this.width = width;
+        this.height = height;
+        this._strokeStyle = strokeColor;
+        this._fillStyle = fillColor;
+    }
+
+    _createClass(Rectangle, [{
+        key: "draw",
+        value: function draw(canvas) {
+            canvas.ctx.lineWidth = 1;
+            canvas.ctx.strokeStyle = this._strokeStyle;
+            canvas.ctx.fillStyle = this._fillStyle;
+            canvas.ctx.strokeRect(this.origin.x, this.origin.y, this.width, this.height);
+            canvas.ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
+        }
+    }, {
+        key: "listeners",
+        value: function listeners() {
+            return [];
+        }
+    }, {
+        key: "containsPoint",
+        value: function containsPoint(point) {
+            return point.x >= this.origin.x && point.y >= this.origin.y && point.x <= this.origin.x + this.width && point.y <= this.origin.y + this.height;
+        }
+    }, {
+        key: "intersects",
+        value: function intersects(line) {
+            if (this.containsPoint(line.left) || this.containsPoint(line.right)) {
+                return true;
+            }
+            var sides = this.sides();
+            return line.intersects(sides.top) || line.intersects(sides.left) || line.intersects(sides.right) || line.intersects(sides.bottom);
+        }
+    }, {
+        key: "intersectsCircle",
+        value: function intersectsCircle(circle) {
+            if (this.containsPoint(circle.center)) {
+                return true;
+            }
+            var sides = this.sides();
+            return sides.top.intersectsCircle(circle) || sides.left.intersectsCircle(circle) || sides.right.intersectsCircle(circle) || sides.bottom.intersectsCircle(circle);
+        }
+    }, {
+        key: "sides",
+        value: function sides() {
+            var topLeft = this.origin;
+            var topRight = this.origin.move(this.width, 0);
+            var bottomLeft = this.origin.move(0, this.height);
+            var bottomRight = this.origin.move(this.width, this.height);
+            var top = new _Segment.Line(topLeft, topRight);
+            var left = new _Segment.Line(topLeft, bottomLeft);
+            var right = new _Segment.Line(topRight, bottomRight);
+            var bottom = new _Segment.Line(bottomLeft, bottomRight);
+            return { top: top, left: left, right: right, bottom: bottom };
+        }
+    }, {
+        key: "equals",
+        value: function equals(rect) {
+            return this.origin.equals(rect.origin) && this.width == rect.width && this.height == rect.height;
+        }
+    }, {
+        key: "fillStyle",
+        set: function set(value) {
+            this._fillStyle = value;
+        },
+        get: function get() {
+            return this._fillStyle;
+        }
+    }, {
+        key: "strokeStyle",
+        set: function set(value) {
+            this._strokeStyle = value;
+        }
+    }]);
+
+    return Rectangle;
+}();
+
+},{"./Segment":13}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1054,8 +1401,8 @@ var Line = exports.Line = function () {
             }
             var nearestX = ax + t * dx;
             var nearestY = ay + t * dy;
-            var dist = Math.sqrt(Math.pow(nearestX - cx, 2) + Math.pow(nearestY - cy, 2));
-            return dist <= r;
+            var dist = Math.pow(nearestX - cx, 2) + Math.pow(nearestY - cy, 2);
+            return dist <= Math.pow(r, 2);
         }
     }, {
         key: "left",
@@ -1080,172 +1427,7 @@ var Line = exports.Line = function () {
     return Line;
 }();
 
-},{}],11:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Point = exports.Point = function () {
-    function Point(x, y) {
-        _classCallCheck(this, Point);
-
-        this._x = x;
-        this._y = y;
-    }
-
-    _createClass(Point, [{
-        key: "equals",
-        value: function equals(point) {
-            return point != null && this.x === point.x && this.y === point.y;
-        }
-    }, {
-        key: "toString",
-        value: function toString() {
-            return "x: " + this.x + " y: " + this.y;
-        }
-    }, {
-        key: "delta",
-        value: function delta(point) {
-            return new Point(this.x - point.x, this.y - point.y);
-        }
-    }, {
-        key: "move",
-        value: function move(x, y) {
-            var applyOnThis = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-            if (applyOnThis) {
-                this.x += x;
-                this.y += y;
-                return this;
-            }
-            return new Point(this.x + x, this.y + y);
-        }
-    }, {
-        key: "x",
-        get: function get() {
-            return this._x;
-        },
-        set: function set(value) {
-            this._x = value;
-        }
-    }, {
-        key: "y",
-        get: function get() {
-            return this._y;
-        },
-        set: function set(value) {
-            this._y = value;
-        }
-    }]);
-
-    return Point;
-}();
-
-},{}],12:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.Rectangle = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Line = require("./Line");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Rectangle = exports.Rectangle = function () {
-    function Rectangle(origin, width, height) {
-        var strokeColor = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "#ffffff";
-        var fillColor = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "#ffffff";
-
-        _classCallCheck(this, Rectangle);
-
-        this.origin = origin;
-        this.width = width;
-        this.height = height;
-        this._strokeStyle = strokeColor;
-        this._fillStyle = fillColor;
-    }
-
-    _createClass(Rectangle, [{
-        key: "draw",
-        value: function draw(canvas) {
-            canvas.ctx.lineWidth = 1;
-            canvas.ctx.strokeStyle = this._strokeStyle;
-            canvas.ctx.fillStyle = this._fillStyle;
-            canvas.ctx.strokeRect(this.origin.x, this.origin.y, this.width, this.height);
-            canvas.ctx.fillRect(this.origin.x, this.origin.y, this.width, this.height);
-        }
-    }, {
-        key: "listeners",
-        value: function listeners() {
-            return [];
-        }
-    }, {
-        key: "containsPoint",
-        value: function containsPoint(point) {
-            return point.x >= this.origin.x && point.y >= this.origin.y && point.x <= this.origin.x + this.width && point.y <= this.origin.y + this.height;
-        }
-    }, {
-        key: "intersects",
-        value: function intersects(line) {
-            if (this.containsPoint(line.left) || this.containsPoint(line.right)) {
-                return true;
-            }
-            var sides = this.sides();
-            return line.intersects(sides.top) || line.intersects(sides.left) || line.intersects(sides.right) || line.intersects(sides.bottom);
-        }
-    }, {
-        key: "intersectsCircle",
-        value: function intersectsCircle(circle) {
-            if (this.containsPoint(circle.center)) {
-                return true;
-            }
-            var sides = this.sides();
-            return sides.top.intersectsCircle(circle) || sides.left.intersectsCircle(circle) || sides.right.intersectsCircle(circle) || sides.bottom.intersectsCircle(circle);
-        }
-    }, {
-        key: "sides",
-        value: function sides() {
-            var topLeft = this.origin;
-            var topRight = this.origin.move(this.width, 0);
-            var bottomLeft = this.origin.move(0, this.height);
-            var bottomRight = this.origin.move(this.width, this.height);
-            var top = new _Line.Line(topLeft, topRight);
-            var left = new _Line.Line(topLeft, bottomLeft);
-            var right = new _Line.Line(topRight, bottomRight);
-            var bottom = new _Line.Line(bottomLeft, bottomRight);
-            return { top: top, left: left, right: right, bottom: bottom };
-        }
-    }, {
-        key: "equals",
-        value: function equals(rect) {
-            return this.origin.equals(rect.origin) && this.width == rect.width && this.height == rect.height;
-        }
-    }, {
-        key: "fillStyle",
-        set: function set(value) {
-            this._fillStyle = value;
-        }
-    }, {
-        key: "strokeStyle",
-        set: function set(value) {
-            this._strokeStyle = value;
-        }
-    }]);
-
-    return Rectangle;
-}();
-
-},{"./Line":10}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -11500,4 +11682,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[6]);
+},{}]},{},[7]);

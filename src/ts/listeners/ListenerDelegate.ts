@@ -2,6 +2,7 @@ import {Listener} from "./Listener";
 import {Point} from "../primitives/Point";
 import {Event} from "./Event";
 import {Canvas} from "../Canvas";
+import {GraphicElement} from "../primitives/GraphicElement";
 
 export class ListenerDelegate {
     private listeners: Listener[];
@@ -17,7 +18,7 @@ export class ListenerDelegate {
     }
 
     addListeners(listeners: Listener[]) {
-        this.listeners = this.listeners.concat(listeners);
+        this.listeners = listeners.concat(this.listeners);
         this.registerEvents(listeners);
     }
 
@@ -34,17 +35,30 @@ export class ListenerDelegate {
 
             element.addEventListener(value.name, evt => {
                 let listeners = this.getListenersByEvent(value.name);
+
                 if (!listeners || listeners.length == 0) {
                     this.element.removeEventListener(value.name, null, false);
                 }
 
-                listeners.forEach(listener => {
-                    let event: Event = {
-                        point: this.getPointFromEvent(evt),
-                        data: evt
-                    };
-                    listener.onAction(event, this.canvas)
-                })
+                let event: Event = {
+                    point: this.getPointFromEvent(evt),
+                    data: evt
+                };
+
+                for (let listener of listeners) {
+                    let ge = listener.element as GraphicElement;
+                    if (ge.containsPoint) {
+                       if (!ge.containsPoint(event.point)) {
+                           continue;
+                       }
+                    }
+
+                    listener.onAction(event, this.canvas);
+
+                    if (!listener.propagation) {
+                        break;
+                    }
+                }
             });
 
             this.registeredEvents.push(value.name);
@@ -71,11 +85,12 @@ export class ListenerDelegate {
 
     getListenersByEvent(event: string) {
         let listeners: Listener[] = [];
-        this.listeners.forEach(value => {
-            if (value.name === event) {
-                listeners.push(value);
+
+        for (let listener of this.listeners) {
+            if (listener.name === event) {
+                listeners.push(listener);
             }
-        });
+        }
 
         return listeners;
     }

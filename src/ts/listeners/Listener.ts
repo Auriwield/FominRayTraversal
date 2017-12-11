@@ -8,4 +8,6 @@ export interface Listener {
     element: GraphicElement | HTMLElement;
 
     onAction: (event: Event, canvas : Canvas) => void;
+
+    propagation : boolean;
 }

@@ -1,4 +1,4 @@
-import {Line} from "./primitives/Line";
+import {Line} from "./primitives/Segment";
 import {Circle} from "./primitives/Circle";
 import {GraphicElement} from "./primitives/GraphicElement";
 import {Canvas} from "./Canvas";
@@ -15,12 +15,12 @@ export class MovableLine implements GraphicElement {
     private callbacks: ((line: Line) => void)[];
 
     constructor(canvas: Canvas) {
-        this.line = new Line(new Point(100, 100), new Point(500, 500), 12, "#212121");
+        this.line = new Line(new Point(100, 100), new Point(500, 500), 2, "#212121");
         this.canvas = canvas;
         this.callbacks = [];
         this.edgeRadius = 24;
-        this.leftEdge = new Circle(this.line.left, this.edgeRadius, "#fff", "#212121", 10);
-        this.rightEdge = new Circle(this.line.right, this.edgeRadius, "#fff","#212121", 10);
+        this.leftEdge = new Circle(this.line.left, this.edgeRadius, "#fff", "#212121");
+        this.rightEdge = new Circle(this.line.right, this.edgeRadius, "#fff","#212121");
     }
 
     draw(canvas: Canvas): void {
@@ -105,5 +105,4 @@ export class MovableLine implements GraphicElement {
         this.callbacks.push(callback);
         callback(this.line);
     }
-
 }

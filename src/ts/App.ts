@@ -1,7 +1,6 @@
 import $ from "jquery";
 import {Canvas} from "./Canvas";
-import {Line} from "./primitives/Line";
-import {Point} from "./primitives/Point";
+import {Line} from "./primitives/Segment";
 import {MovableLine} from "./MovableLine";
 import {Grid} from "./Grid";
 import {CircleKeeper} from "./CircleKeeper";
@@ -31,6 +30,8 @@ $(() => {
             circleKeeper.updateIntersection(rects, line)
         });
 
+    circleKeeper.onCircleMoved = () => movableLine.callCallbacks();
+
     canvas.addElement(circleKeeper);
     canvas.addElement(movableLine);
     canvas.refresh();
@@ -38,6 +39,13 @@ $(() => {
     $("#trace-circle-area").change((evt) => {
         let e = <any> evt;
         Config.circleTraversal = e.target.checked;
+        movableLine.callCallbacks();
+        canvas.refresh();
+    });
+
+    $("#trace-all-circle-area").change((evt) => {
+        let e = <any> evt;
+        Config.allCircleTraversal = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });

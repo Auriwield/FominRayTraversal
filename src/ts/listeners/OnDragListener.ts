@@ -8,6 +8,7 @@ export class OnDragListener implements Listener {
     name: string = "onDragListener";
     element: GraphicElement;
     onAction: (event: Event, canvas: Canvas) => void;
+    propagation : boolean = false;
 
     private downPoint: Point = null;
     private lastEventPoint: Point = null;
@@ -24,6 +25,7 @@ export class OnDragListener implements Listener {
         listeners.push({
             name: "mousedown",
             element: this.element,
+            propagation: false,
             onAction: (event) => {
                 if (this.element.containsPoint(event.point)) {
                     this.downPoint = event.point;
@@ -34,6 +36,7 @@ export class OnDragListener implements Listener {
         listeners.push({
             name: "mouseup",
             element: document.body,
+            propagation: true,
             onAction: () => {
                 this.downPoint = null;
             }
@@ -44,6 +47,7 @@ export class OnDragListener implements Listener {
         listeners.push({
             name: "mousemove",
             element: document.body,
+            propagation: true,
             onAction: (event, canvas) => {
                 if (this.downPoint) {
                     //let delta = event.point.delta(this.downPoint);

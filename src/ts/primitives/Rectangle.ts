@@ -2,7 +2,7 @@ import {GraphicElement} from "./GraphicElement";
 import {Point} from "./Point";
 import {Canvas} from "../Canvas";
 import {Listener} from "../listeners/Listener";
-import {Line} from "./Line";
+import {Line} from "./Segment";
 import {Circle} from "./Circle";
 
 export class Rectangle implements GraphicElement {
@@ -89,6 +89,10 @@ export class Rectangle implements GraphicElement {
 
     set fillStyle(value: string) {
         this._fillStyle = value;
+    }
+
+    get fillStyle(): string {
+        return this._fillStyle;
     }
 
     set strokeStyle(value: string) {

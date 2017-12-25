@@ -32,7 +32,7 @@ export class Grid implements GraphicElement {
             }
         }
 
-        let lineWidth = 1;
+        let lineWidth = 0.5;
         let lineColor = "#222";
 
         for (let i = 1; i < size; i++) {

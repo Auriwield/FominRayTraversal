@@ -30,6 +30,9 @@ export class Canvas {
         this.canvas.style.height = `${this._height / this.ratio}px`;
         this.elements = [];
         this.clear();
+        window.addEventListener("resize", () => {
+            this.refresh();
+        })
     }
 
     refresh() {

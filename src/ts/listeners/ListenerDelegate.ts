@@ -27,17 +27,16 @@ export class ListenerDelegate {
 
             if (!value || !value.name
                 || this.registeredEvents.indexOf(value.name) !== -1) {
-                if (value.name) console.log("drop " + value.name);
                 return;
             }
 
-            let element = value.element instanceof HTMLElement ? value.element : this.element;
+            let element = value.element instanceof HTMLElement ? value.element : document.body;
 
             element.addEventListener(value.name, evt => {
                 let listeners = this.getListenersByEvent(value.name);
 
                 if (!listeners || listeners.length == 0) {
-                    this.element.removeEventListener(value.name, null, false);
+                    element.removeEventListener(value.name, null, false);
                 }
 
                 let event: Event = {

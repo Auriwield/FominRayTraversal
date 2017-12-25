@@ -31,7 +31,7 @@ export class CircleKeeper implements GraphicElement {
         let x = edgeCorrection + Math.random() * (this.grid.width - edgeCorrection * 2);
         let y = edgeCorrection + Math.random() * (this.grid.height - edgeCorrection * 2);
 
-        let circle = new MovableCircle(new Point(x, y), r, "rgba(255, 255, 255, 0.0)", "#000", 5);
+        let circle = new MovableCircle(new Point(x, y), r, "rgba(255, 255, 255, 0.0)", "#000", 1);
         let rects: Rectangle[] = this.getRectsIntersectCircle(circle);
 
         let rel: [Circle, Rectangle[]] = [circle, rects];
@@ -74,7 +74,7 @@ export class CircleKeeper implements GraphicElement {
         for (let i = 0; i < this.circlesAmount; i++) {
             this.circleRectRelation[i][0].strokeStyle = "#000000";
             this.circleRectRelation[i][0].fillStyle = "rgba(0,0,0,0)";
-            this.circleRectRelation[i][0].lineWidth = 2;
+            this.circleRectRelation[i][0].lineWidth = 1;
         }
 
         if (Config.allCircleTraversal) {
@@ -93,7 +93,7 @@ export class CircleKeeper implements GraphicElement {
             if (line.intersectsCircle(circle)) {
                 //circle.strokeStyle = "#9E9E9E";
                 circle.fillStyle = "rgba(30,30,30,0.5)";
-                circle.lineWidth = 2;
+                circle.lineWidth = 1.5;
             }
         }
     }

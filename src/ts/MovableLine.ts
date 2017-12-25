@@ -5,6 +5,7 @@ import {Canvas} from "./Canvas";
 import {Listener} from "./listeners/Listener";
 import {Point} from "./primitives/Point";
 import {OnDragListener} from "./listeners/OnDragListener";
+import {HtmlCircle} from "./HtmlCircle";
 
 export class MovableLine implements GraphicElement {
     private line: Line;
@@ -15,12 +16,12 @@ export class MovableLine implements GraphicElement {
     private callbacks: ((line: Line) => void)[];
 
     constructor(canvas: Canvas) {
-        this.line = new Line(new Point(100, 100), new Point(500, 500), 2, "#212121");
+        this.line = new Line(new Point(100, 100), new Point(500, 500), 1, "#212121");
         this.canvas = canvas;
         this.callbacks = [];
         this.edgeRadius = 24;
-        this.leftEdge = new Circle(this.line.left, this.edgeRadius, "#fff", "#212121");
-        this.rightEdge = new Circle(this.line.right, this.edgeRadius, "#fff","#212121");
+        this.leftEdge = new HtmlCircle(this.line.left, this.edgeRadius, "#fff", "#212121");
+        this.rightEdge = new HtmlCircle(this.line.right, this.edgeRadius, "#fff", "#212121");
     }
 
     draw(canvas: Canvas): void {
@@ -69,10 +70,10 @@ export class MovableLine implements GraphicElement {
         let p2 = new Point(p1.x + this.canvas.width - r * 2,
             p1.y + this.canvas.height - r * 2);
 
-        if (p.x < p1.x) p.x = p1.x;
+        /*if (p.x < p1.x) p.x = p1.x;
         if (p.y < p1.y) p.y = p1.y;
         if (p.x > p2.x) p.x = p2.x;
-        if (p.y > p2.y) p.y = p2.y;
+        if (p.y > p2.y) p.y = p2.y;*/
 
         let lc = this.leftEdge.center;
         let rc = this.rightEdge.center;

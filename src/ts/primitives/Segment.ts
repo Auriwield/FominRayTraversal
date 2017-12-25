@@ -22,7 +22,7 @@ export class Line implements GraphicElement {
         canvas.ctx.beginPath();
         canvas.ctx.moveTo(this.left.x, this.left.y);
         canvas.ctx.lineTo(this.right.x, this.right.y);
-        canvas.ctx.lineWidth = this.lineWidth;
+        canvas.ctx.lineWidth = this.lineWidth * canvas.ratio;
         canvas.ctx.strokeStyle = this.lineColor;
         canvas.ctx.stroke();
     }

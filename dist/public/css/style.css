@@ -37,3 +37,9 @@ a {
   float: right;
   margin-top: 3px;
 }
+
+.circle {
+  position: fixed;
+  border-radius: 50%;
+  border-style: solid;
+}

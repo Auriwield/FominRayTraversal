@@ -25,7 +25,7 @@ export class Rectangle implements GraphicElement {
     }
 
     draw(canvas: Canvas): void {
-        canvas.ctx.lineWidth = 1;
+        canvas.ctx.lineWidth = canvas.ratio;
 
         canvas.ctx.strokeStyle = this._strokeStyle;
         canvas.ctx.fillStyle = this._fillStyle;

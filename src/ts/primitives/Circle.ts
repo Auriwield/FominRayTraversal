@@ -4,11 +4,11 @@ import {Point} from "./Point";
 import {Listener} from "../listeners/Listener";
 
 export class Circle implements GraphicElement {
-    private _center: Point;
-    private _radius: number;
-    private _fillStyle: string;
-    private _strokeStyle: string;
-    private _lineWidth: number;
+    protected _center: Point;
+    protected _radius: number;
+    protected _fillStyle: string;
+    protected _strokeStyle: string;
+    protected _lineWidth: number;
 
     constructor(center: Point,
                 radius: number,
@@ -28,7 +28,7 @@ export class Circle implements GraphicElement {
             this._radius, 0, 2 * Math.PI, false);
         canvas.ctx.fillStyle = this._fillStyle;
         canvas.ctx.fill();
-        canvas.ctx.lineWidth = this._lineWidth;
+        canvas.ctx.lineWidth = this._lineWidth * canvas.ratio;
         canvas.ctx.strokeStyle = this._strokeStyle;
         canvas.ctx.stroke();
     }

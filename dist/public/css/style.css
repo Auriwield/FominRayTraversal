@@ -43,3 +43,12 @@ a {
   border-radius: 50%;
   border-style: solid;
 }
+
+/*noinspection CssUnknownProperty*/
+.unselectable {
+  -webkit-user-select: none; /* SAFARI, CHROME */
+  -khtml-user-select: none; /* KONQUEROR */
+  --user-select: none; /* FIREFOX */
+  -ns-user-select: none; /* IE */
+  user-select: none; /* CSS3 */
+}

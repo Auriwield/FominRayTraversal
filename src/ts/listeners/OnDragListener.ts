@@ -8,7 +8,7 @@ export class OnDragListener implements Listener {
     name: string = "onDragListener";
     element: GraphicElement;
     onAction: (event: Event, canvas: Canvas) => void;
-    propagation : boolean = false;
+    propagation: boolean = false;
 
     private downPoint: Point = null;
     private lastEventPoint: Point = null;
@@ -26,9 +26,10 @@ export class OnDragListener implements Listener {
             name: "mousedown",
             element: this.element,
             propagation: false,
-            onAction: (event) => {
+            onAction: (event: Event) => {
                 if (this.element.containsPoint(event.point)) {
                     this.downPoint = event.point;
+                    event.preventDefault();
                 }
             }
         });
@@ -44,13 +45,27 @@ export class OnDragListener implements Listener {
 
         let callback = this.onAction;
 
+
+        let detectLeftButton = (evt : any) => {
+            evt = evt || window.event;
+            if ("buttons" in evt) {
+                return evt.buttons == 1;
+            }
+            let button = evt.which || evt.button;
+            return button == 1;
+        };
+
         listeners.push({
             name: "mousemove",
             element: document.body,
             propagation: true,
             onAction: (event, canvas) => {
                 if (this.downPoint) {
-                    //let delta = event.point.delta(this.downPoint);
+
+                    if (!detectLeftButton(event)) {
+                        this.downPoint = null;
+                        return;
+                    }
 
                     this.downPoint = event.point;
 
@@ -60,12 +75,7 @@ export class OnDragListener implements Listener {
 
                     this.lastEventPoint = event.point;
 
-                    let e: Event = {
-                        point: event.point,
-                        data: event
-                    };
-
-                    callback(e, canvas);
+                    callback(event, canvas);
                 }
             }
         });

@@ -3,7 +3,7 @@ import {Point} from "./primitives/Point";
 import {GraphicElement} from "./primitives/GraphicElement";
 import {Canvas} from "./Canvas";
 import {Listener} from "./listeners/Listener";
-import {Line} from "./primitives/Segment";
+import {Segment} from "./primitives/Segment";
 import {Config} from "./Config";
 
 export class Grid implements GraphicElement {
@@ -12,7 +12,9 @@ export class Grid implements GraphicElement {
     private _width: number;
     private _height: number;
     private _rects: Rectangle[];
-    private lines: Line[];
+    private lines: Segment[];
+
+    layer = -1;
 
     constructor(size: number, width: number, height: number) {
         this.size = size;
@@ -39,18 +41,18 @@ export class Grid implements GraphicElement {
             let height = rectHeight * i;
             let left = new Point(0, height);
             let right = new Point(this._width, height);
-            this.lines.push(new Line(left, right, lineWidth, lineColor));
+            this.lines.push(new Segment(left, right, lineWidth, lineColor));
         }
 
         for (let j = 1; j < size; j++) {
             let width = rectWidth * j;
             let left = new Point(width, 0);
             let right = new Point(width, this._height);
-            this.lines.push(new Line(left, right, lineWidth, lineColor));
+            this.lines.push(new Segment(left, right, lineWidth, lineColor));
         }
     }
 
-    updateIntersection(line: Line): Rectangle[] {
+    updateIntersection(line: Segment): Rectangle[] {
         let rects: Rectangle[] = [];
         for (let rect of this._rects) {
 

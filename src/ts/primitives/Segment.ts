@@ -3,12 +3,17 @@ import {Canvas} from "../Canvas";
 import {Point} from "./Point";
 import {Listener} from "../listeners/Listener";
 import {Circle} from "./Circle";
+import {Rectangle} from "./Rectangle";
+import {Line} from "./Line";
+import {Config} from "../Config";
 
-export class Line implements GraphicElement {
+export class Segment implements GraphicElement {
     private _left: Point;
     private _right: Point;
     private lineWidth: number;
     private lineColor: string;
+
+    layer = 0;
 
     constructor(p1: Point, p2: Point, lineWidth = 1, lineColor = "black") {
         this._left = p1;
@@ -27,8 +32,16 @@ export class Line implements GraphicElement {
         canvas.ctx.stroke();
     }
 
-    containsPoint(point: Point): boolean {
-        return false;
+    containsPoint(p: Point): boolean {
+        let x1 = this.left.x;
+        let x2 = this.right.x;
+        let y1 = this.left.y;
+        let y2 = this.right.y;
+
+        let x = Math.min(x1,x2), X = Math.max(x1,x2);
+        let y = Math.min(y1,y2), Y = Math.max(y1,y2);
+        return x - Config.EPS <= p.x && p.x <= X + Config.EPS &&
+            y - Config.EPS <= p.y && p.y <= Y + Config.EPS;
     }
 
     listeners(): Listener[] {
@@ -61,7 +74,7 @@ export class Line implements GraphicElement {
         }
     }
 
-    intersects(line: Line): boolean {
+    intersects(line: Segment): boolean {
         let l1p1 = this.left;
         let l1p2 = this.right;
         let l2p1 = line.left;
@@ -83,49 +96,20 @@ export class Line implements GraphicElement {
         return !(r < 0 || r > 1 || s < 0 || s > 1);
     }
 
-    /*
-        Dx = Bx-Ax;
-        Dy = By-Ay;
-
-        LAB = (Dx^2 + Dy^2);
-        t = ((Cx - Ax) * Dx + (Cy - Ay) * Dy) / LAB;
-
-        if t > 1
-            t=1;
-        elseif t<0
-            t=0;
-        end;
-
-
-        nearestX = Ax + t * Dx;
-        nearestY = Ay + t * Dy;
-
-        dist = sqrt( (nearestX-Cx)^2 + (nearestY-Cy)^2 );
-
-        if (dist > R )
-         flag=0;
-        else
-         flag=1;
-        end
-
-     */
-
-    intersectsCircle(circle: Circle) : boolean {
-
+    intersectsCircle(circle: Circle): boolean {
         let ax = this.left.x;
         let bx = this.right.x;
-
         let ay = this.left.y;
         let by = this.right.y;
 
-        let cx =  circle.center.x;
+        let cx = circle.center.x;
         let cy = circle.center.y;
         let r = circle.radius;
 
         let dx = bx - ax;
         let dy = by - ay;
 
-        let lab = dx ** 2 + dy ** 2;
+        let lab = dx * dx + dy * dy;
         let t = ((cx - ax) * dx + (cy - ay) * dy) / lab;
 
         if (t > 1) {
@@ -138,8 +122,50 @@ export class Line implements GraphicElement {
         let nearestX = ax + t * dx;
         let nearestY = ay + t * dy;
 
-        let dist = (nearestX-cx)**2 + (nearestY-cy)**2 ;
+        let dist = (nearestX - cx) ** 2 + (nearestY - cy) ** 2;
 
         return dist <= r ** 2;
+    }
+
+    getIntersectionPoints(circle: Circle): Point[] {
+        let points = this.convertToLine().intersects(circle);
+
+        if (points.length === 0) {
+            return [];
+        }
+
+        let p1 = points[0];
+        let includePt1 = this.containsPoint(p1);
+
+        if (points.length === 1) {
+            return includePt1 ? [p1] : [];
+        }
+
+        let p2 = points[1];
+        let includePt2 = this.containsPoint(p2);
+
+        if (includePt1 && includePt2) {
+            return [p1, p2];
+        }
+        if (includePt1) {
+            return [p1];
+        }
+        if (includePt2) {
+            return [p2];
+        }
+        return [];
+    }
+
+    convertToLine() : Line {
+        let ax = this.left.x;
+        let bx = this.right.x;
+        let ay = this.left.y;
+        let by = this.right.y;
+
+        let a = ay - by;
+        let b = bx - ax;
+        let c = bx * ay - ax * by;
+
+        return new Line(a, b, c);
     }
 }

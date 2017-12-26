@@ -39,10 +39,9 @@ export class ListenerDelegate {
                     element.removeEventListener(value.name, null, false);
                 }
 
-                let event: Event = {
-                    point: this.getPointFromEvent(evt),
-                    data: evt
-                };
+                let event: Event = <Event>evt;
+                event.point = this.getPointFromEvent(evt);
+                event.data = evt;
 
                 for (let listener of listeners) {
                     let ge = listener.element as GraphicElement;

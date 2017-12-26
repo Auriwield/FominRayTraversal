@@ -5,15 +5,18 @@ import {Rectangle} from "./primitives/Rectangle";
 import {GraphicElement} from "./primitives/GraphicElement";
 import {Canvas} from "./Canvas";
 import {Listener} from "./listeners/Listener";
-import {Line} from "./primitives/Segment";
+import {Segment} from "./primitives/Segment";
 import {Config} from "./Config";
 import {MovableCircle} from "./MovableCircle";
 
 export class CircleKeeper implements GraphicElement {
+    private static DefaultLayer = 0;
     private circleRectRelation: [Circle, Rectangle[]][];
     private grid: Grid;
     private circlesAmount: number = 0;
     onCircleMoved: () => void;
+
+    layer = CircleKeeper.DefaultLayer;
 
     constructor(grid: Grid, circlesAmount: number) {
         this.circleRectRelation = [];
@@ -69,8 +72,7 @@ export class CircleKeeper implements GraphicElement {
         }
     }
 
-    updateIntersection(rects: Rectangle[], line: Line) {
-
+    updateIntersection(rects: Rectangle[], line: Segment) {
         for (let i = 0; i < this.circlesAmount; i++) {
             this.circleRectRelation[i][0].strokeStyle = "#000000";
             this.circleRectRelation[i][0].fillStyle = "rgba(0,0,0,0)";
@@ -81,7 +83,7 @@ export class CircleKeeper implements GraphicElement {
             for (let i = 0; i < this.circlesAmount; i++) {
                 let rects = this.circleRectRelation[i][1];
                 for (let rect of rects) {
-                    rect.fillStyle =  Config.green;
+                    rect.fillStyle = Config.green;
                 }
             }
         }
@@ -90,10 +92,14 @@ export class CircleKeeper implements GraphicElement {
         if (circles.length == 0) return;
 
         for (let circle of circles) {
-            if (line.intersectsCircle(circle)) {
-                //circle.strokeStyle = "#9E9E9E";
+            let points = line.getIntersectionPoints(circle);
+            if (points.length > 0) {
+                circle.intersectionPoints(points);
                 circle.fillStyle = "rgba(30,30,30,0.5)";
                 circle.lineWidth = 1.5;
+                this.layer = 3;
+            } else {
+                this.layer = CircleKeeper.DefaultLayer;
             }
         }
     }

@@ -2,7 +2,7 @@ import {GraphicElement} from "./GraphicElement";
 import {Point} from "./Point";
 import {Canvas} from "../Canvas";
 import {Listener} from "../listeners/Listener";
-import {Line} from "./Segment";
+import {Segment} from "./Segment";
 import {Circle} from "./Circle";
 
 export class Rectangle implements GraphicElement {
@@ -11,6 +11,9 @@ export class Rectangle implements GraphicElement {
     private height: number;
     private _strokeStyle: string;
     private _fillStyle: string;
+
+
+    layer = 0;
 
     constructor(origin: Point,
                 width: number,
@@ -45,7 +48,7 @@ export class Rectangle implements GraphicElement {
             && point.y <= this.origin.y + this.height;
     }
 
-    intersects(line: Line): boolean {
+    intersects(line: Segment): boolean {
         if (this.containsPoint(line.left)
             || this.containsPoint(line.right)) {
             return true;
@@ -79,10 +82,10 @@ export class Rectangle implements GraphicElement {
         let bottomLeft = this.origin.move(0, this.height);
         let bottomRight = this.origin.move(this.width, this.height);
 
-        let top = new Line(topLeft, topRight);
-        let left = new Line(topLeft, bottomLeft);
-        let right = new Line(topRight, bottomRight);
-        let bottom = new Line(bottomLeft, bottomRight);
+        let top = new Segment(topLeft, topRight);
+        let left = new Segment(topLeft, bottomLeft);
+        let right = new Segment(topRight, bottomRight);
+        let bottom = new Segment(bottomLeft, bottomRight);
 
         return {top, left, right, bottom};
     }

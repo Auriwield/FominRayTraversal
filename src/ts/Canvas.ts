@@ -37,7 +37,9 @@ export class Canvas {
 
     refresh() {
         this.clear();
-        this.elements.forEach(value => value.draw(this));
+        this.elements
+            .sort((a, b) => a.layer - b.layer)
+            .forEach(value => value.draw(this));
     }
 
     clear() {

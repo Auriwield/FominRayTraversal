@@ -2,6 +2,7 @@ import {GraphicElement} from "./GraphicElement";
 import {Canvas} from "../Canvas";
 import {Point} from "./Point";
 import {Listener} from "../listeners/Listener";
+import {Config} from "../Config";
 
 export class Circle implements GraphicElement {
     protected _center: Point;
@@ -9,6 +10,9 @@ export class Circle implements GraphicElement {
     protected _fillStyle: string;
     protected _strokeStyle: string;
     protected _lineWidth: number;
+    private _intersectionPoints: Circle[] = [];
+
+    layer = this.getDefaultLayer();
 
     constructor(center: Point,
                 radius: number,
@@ -31,6 +35,10 @@ export class Circle implements GraphicElement {
         canvas.ctx.lineWidth = this._lineWidth * canvas.ratio;
         canvas.ctx.strokeStyle = this._strokeStyle;
         canvas.ctx.stroke();
+        for (let circle of this._intersectionPoints) {
+            circle.draw(canvas);
+        }
+        this._intersectionPoints = [];
     }
 
     containsPoint(point: Point): boolean {
@@ -70,6 +78,14 @@ export class Circle implements GraphicElement {
         return rm * rm <= d && d <= rp * rp;
     }
 
+    intersectionPoints(points: Point[]) {
+        this._intersectionPoints = [];
+        for (let p of points) {
+            let circle = new Circle(p, 6, Config.white, Config.black, 1);
+            this._intersectionPoints.push(circle);
+        }
+    }
+
     set strokeStyle(value: string) {
         this._strokeStyle = value;
     }
@@ -81,5 +97,9 @@ export class Circle implements GraphicElement {
 
     set lineWidth(value: number) {
         this._lineWidth = value;
+    }
+
+    getDefaultLayer() : number {
+        return 1;
     }
 }

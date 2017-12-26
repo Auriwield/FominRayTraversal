@@ -1,6 +1,6 @@
 import $ from "jquery";
 import {Canvas} from "./Canvas";
-import {Line} from "./primitives/Segment";
+import {Segment} from "./primitives/Segment";
 import {MovableLine} from "./MovableLine";
 import {Grid} from "./Grid";
 import {CircleKeeper} from "./CircleKeeper";
@@ -25,7 +25,7 @@ $(() => {
     let circleKeeper = new CircleKeeper(grid, 15);
 
     movableLine.addCallback(
-        (line: Line) => {
+        (line: Segment) => {
             let rects = grid.updateIntersection(line);
             circleKeeper.updateIntersection(rects, line)
         });

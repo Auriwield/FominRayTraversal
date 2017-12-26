@@ -20,6 +20,7 @@ export class HtmlCircle extends Circle {
         this.element.style.height = radius + "px";
         this.element.style.width = radius + "px";
         this.element.classList.add("circle");
+        this.element.classList.add("unselectable");
         this.element.style.borderWidth = lineWidth + "px";
         this.element.style.backgroundColor = fillStyle;
         this.element.style.borderColor = strokeStyle;

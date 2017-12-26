@@ -44,8 +44,6 @@ export class OnDragListener implements Listener {
         });
 
         let callback = this.onAction;
-
-
         let detectLeftButton = (evt : any) => {
             evt = evt || window.event;
             if ("buttons" in evt) {

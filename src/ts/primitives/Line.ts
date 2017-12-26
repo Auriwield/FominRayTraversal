@@ -3,11 +3,26 @@ import {Circle} from "./Circle";
 import {Config} from "../Config";
 
 export class Line {
-    private _a : number;
-    private _b : number;
-    private _c : number;
+    private _a: number;
+    private _b: number;
+    private _c: number;
 
     constructor(a: number, b: number, c: number) {
+
+        console.log(`a: ${a} b: ${b} c: ${c}`);
+
+        if (Math.abs(b) < Config.EPS) {
+            c /= a;
+            a = 1;
+            b = 0;
+        } else {
+            a = (Math.abs(a) < Config.EPS) ? 0 : a / b;
+            c /= b;
+            b = 1;
+        }
+
+        console.log(`a: ${a} b: ${b} c: ${c}`);
+
         this._a = a;
         this._b = b;
         this._c = c;
@@ -26,7 +41,9 @@ export class Line {
         return this._c;
     }
 
-    intersects(circle: Circle): Point[]  {
+    static min: number = 999999999990;
+
+    intersects(circle: Circle): Point[] {
         let a = this.a;
         let b = this.b;
         let c = this.c;
@@ -50,12 +67,13 @@ export class Line {
             x1 = c / a;
 
             // No intersection
-            if (Math.abs(x - x1) > r)
+            if (Math.abs(x - x1) > r) {
                 return [];
+            }
 
             // Vertical line is tangent to circle
-            if (Math.abs((x1 - r) - x) < Config.EPS
-                || Math.abs((x1 + r) - x) < Config.EPS)
+            if (Math.abs(x1 - (x - r)) < Config.LowEps
+                || Math.abs(x1 - (x + r)) < Config.LowEps)
                 return [new Point(x1, y)];
 
             let dx = Math.abs(x1 - x);
@@ -69,7 +87,7 @@ export class Line {
         }
 
         // Segment is tangent to circle
-        if (Math.abs(D) < Config.EPS) {
+        if (Math.abs(D) < 1200) {
             x1 = -B / (2 * A);
             y1 = (c - a * x1) / b;
 

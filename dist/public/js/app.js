@@ -250,6 +250,9 @@ var CircleKeeper = exports.CircleKeeper = function () {
                     var circle = _step3.value;
 
                     var points = line.getIntersectionPoints(circle);
+                    if (points.length === 1) {
+                        console.log("bug");
+                    }
                     if (points.length > 0) {
                         circle.intersectionPoints(points);
                         circle.fillStyle = "rgba(30,30,30,0.5)";
@@ -400,7 +403,8 @@ var Config = {
     "red": "#F44336",
     "green": "#4CAF50",
     "brown": "#CA5D3C",
-    "EPS": 0.0000001
+    "EPS": 0.0000001,
+    "LowEps": 2
 };
 exports.Config = Config;
 
@@ -1294,6 +1298,17 @@ var Line = exports.Line = function () {
     function Line(a, b, c) {
         _classCallCheck(this, Line);
 
+        console.log("a: " + a + " b: " + b + " c: " + c);
+        if (Math.abs(b) < _Config.Config.EPS) {
+            c /= a;
+            a = 1;
+            b = 0;
+        } else {
+            a = Math.abs(a) < _Config.Config.EPS ? 0 : a / b;
+            c /= b;
+            b = 1;
+        }
+        console.log("a: " + a + " b: " + b + " c: " + c);
         this._a = a;
         this._b = b;
         this._c = c;
@@ -1322,16 +1337,18 @@ var Line = exports.Line = function () {
                 // Segment equation is ax + by = c, but b = 0, so x = c/a
                 x1 = c / a;
                 // No intersection
-                if (Math.abs(x - x1) > r) return [];
+                if (Math.abs(x - x1) > r) {
+                    return [];
+                }
                 // Vertical line is tangent to circle
-                if (Math.abs(x1 - r - x) < _Config.Config.EPS || Math.abs(x1 + r - x) < _Config.Config.EPS) return [new _Point.Point(x1, y)];
+                if (Math.abs(x1 - (x - r)) < _Config.Config.LowEps || Math.abs(x1 - (x + r)) < _Config.Config.LowEps) return [new _Point.Point(x1, y)];
                 var dx = Math.abs(x1 - x);
                 var dy = Math.sqrt(r * r - dx * dx);
                 // Vertical line cuts through circle
                 return [new _Point.Point(x1, y + dy), new _Point.Point(x1, y - dy)];
             }
             // Segment is tangent to circle
-            if (Math.abs(D) < _Config.Config.EPS) {
+            if (Math.abs(D) < 1200) {
                 x1 = -B / (2 * A);
                 y1 = (c - a * x1) / b;
                 return [new _Point.Point(x1, y1)];
@@ -1366,6 +1383,8 @@ var Line = exports.Line = function () {
 
     return Line;
 }();
+
+Line.min = 999999999990;
 
 },{"../Config":3,"./Point":13}],13:[function(require,module,exports){
 "use strict";

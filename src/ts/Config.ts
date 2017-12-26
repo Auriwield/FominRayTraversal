@@ -9,7 +9,8 @@ let Config : any = {
     "red" : "#F44336",
     "green" : "#4CAF50",
     "brown" : "#CA5D3C",
-    "EPS" : 0.0000001
+    "EPS" : 0.0000001,
+    "LowEps" : 2
 };
 
 export {Config};

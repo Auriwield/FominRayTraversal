@@ -93,9 +93,6 @@ export class CircleKeeper implements GraphicElement {
 
         for (let circle of circles) {
             let points = line.getIntersectionPoints(circle);
-            if (points.length === 1) {
-                console.log("bug");
-            }
             if (points.length > 0) {
                 circle.intersectionPoints(points);
                 circle.fillStyle = "rgba(30,30,30,0.5)";

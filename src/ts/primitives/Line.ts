@@ -8,9 +8,6 @@ export class Line {
     private _c: number;
 
     constructor(a: number, b: number, c: number) {
-
-        console.log(`a: ${a} b: ${b} c: ${c}`);
-
         if (Math.abs(b) < Config.EPS) {
             c /= a;
             a = 1;
@@ -20,8 +17,6 @@ export class Line {
             c /= b;
             b = 1;
         }
-
-        console.log(`a: ${a} b: ${b} c: ${c}`);
 
         this._a = a;
         this._b = b;

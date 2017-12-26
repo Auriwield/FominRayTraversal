@@ -250,9 +250,6 @@ var CircleKeeper = exports.CircleKeeper = function () {
                     var circle = _step3.value;
 
                     var points = line.getIntersectionPoints(circle);
-                    if (points.length === 1) {
-                        console.log("bug");
-                    }
                     if (points.length > 0) {
                         circle.intersectionPoints(points);
                         circle.fillStyle = "rgba(30,30,30,0.5)";
@@ -1298,7 +1295,6 @@ var Line = exports.Line = function () {
     function Line(a, b, c) {
         _classCallCheck(this, Line);
 
-        console.log("a: " + a + " b: " + b + " c: " + c);
         if (Math.abs(b) < _Config.Config.EPS) {
             c /= a;
             a = 1;
@@ -1308,7 +1304,6 @@ var Line = exports.Line = function () {
             c /= b;
             b = 1;
         }
-        console.log("a: " + a + " b: " + b + " c: " + c);
         this._a = a;
         this._b = b;
         this._c = c;

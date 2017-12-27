@@ -64,6 +64,10 @@ export class Canvas {
         this.listenerDelegate.addListeners(listeners);
     }
 
+    addListeners(listeners: Listener[]) {
+        this.listenerDelegate.addListeners(listeners);
+    }
+
     get width(): number {
         return this._width;
     }

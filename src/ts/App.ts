@@ -36,7 +36,7 @@ $(() => {
     canvas.addElement(movableLine);
     canvas.refresh();
 
-    let bindCheckbox = (id : string, configProp : string) => {
+    let bindCheckbox = (id: string, configProp: string) => {
         $(id)
             .prop("checked", Config[configProp])
             .change((evt) => {
@@ -54,8 +54,9 @@ $(() => {
     bindCheckbox("#show-map", "ShowMap");
 
     $("#add-circle-button").click(() => {
-        circleKeeper.addCircle();
+        let listeners = circleKeeper.addCircle();
         movableLine.callCallbacks();
+        canvas.addListeners(listeners);
         canvas.refresh();
     });
 

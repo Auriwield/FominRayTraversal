@@ -29,7 +29,7 @@ export class CircleKeeper implements GraphicElement {
         }
     }
 
-    addCircle() {
+    addCircle() : Listener[] {
         let r = 20 + Math.random() * 50;
         let edgeCorrection = r + 10;
 
@@ -48,6 +48,8 @@ export class CircleKeeper implements GraphicElement {
 
         this.circleRectRelation.push(rel);
         this.circlesAmount++;
+
+        return circle.listeners();
     }
 
     getRectsIntersectCircle(circle: Circle): Rectangle[] {

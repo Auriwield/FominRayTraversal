@@ -86,6 +86,11 @@ var Canvas = exports.Canvas = function () {
             this.listenerDelegate.addListeners(listeners);
         }
     }, {
+        key: "addListeners",
+        value: function addListeners(listeners) {
+            this.listenerDelegate.addListeners(listeners);
+        }
+    }, {
         key: "width",
         get: function get() {
             return this._width;
@@ -156,7 +161,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     var grid = new _Grid.Grid(20, side, side);
     canvas.addElement(grid);
     var movableLine = new _MovableLine.MovableLine(canvas);
-    var circleKeeper = new _CircleKeeper.CircleKeeper(grid, 1000);
+    var circleKeeper = new _CircleKeeper.CircleKeeper(grid, 15);
     movableLine.addCallback(function (line) {
         var rects = grid.updateIntersection(line);
         circleKeeper.updateIntersection(rects, line);
@@ -181,8 +186,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     bindCheckbox("#show-grid", "ShowGrid");
     bindCheckbox("#show-map", "ShowMap");
     (0, _jquery2.default)("#add-circle-button").click(function () {
-        circleKeeper.addCircle();
+        var listeners = circleKeeper.addCircle();
         movableLine.callCallbacks();
+        canvas.addListeners(listeners);
         canvas.refresh();
     });
     (0, _jquery2.default)("#remove-circle-button").click(function () {
@@ -244,6 +250,7 @@ var CircleKeeper = exports.CircleKeeper = function () {
             };
             this.circleRectRelation.push(rel);
             this.circlesAmount++;
+            return circle.listeners();
         }
     }, {
         key: "getRectsIntersectCircle",

@@ -81,7 +81,7 @@ export class Circle implements GraphicElement {
     intersectionPoints(points: Point[]) {
         this._intersectionPoints = [];
         for (let p of points) {
-            let circle = new Circle(p, 6, Config.white, Config.black, 1);
+            let circle = new Circle(p, 6, Config.White, Config.Black, 1);
             this._intersectionPoints.push(circle);
         }
     }

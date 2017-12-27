@@ -1,8 +1,8 @@
-import {Circle} from "./primitives/Circle";
-import {Listener} from "./listeners/Listener";
-import {OnDragListener} from "./listeners/OnDragListener";
-import {Point} from "./primitives/Point";
-import {Canvas} from "./Canvas";
+import {Circle} from "../primitives/Circle";
+import {Listener} from "../listeners/Listener";
+import {OnDragListener} from "../listeners/OnDragListener";
+import {Point} from "../primitives/Point";
+import {Canvas} from "../Canvas";
 
 export class MovableCircle extends Circle {
     onCircleMoved: () => void;

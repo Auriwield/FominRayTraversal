@@ -12,7 +12,6 @@ const notifier = require('node-notifier');
 const ts = require('gulp-typescript');
 const tsProject = ts.createProject('tsconfig.json', {noImplicitAny: true});
 const longReporter = ts.reporter.fullReporter();
-
 const notifyFn = debouncy((err) => {
     // noinspection JSUnresolvedFunction
     notifier.notify({title: "Typescript error", message: err.message});

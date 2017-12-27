@@ -1,13 +1,14 @@
-import {Circle} from "./primitives/Circle";
+import {Circle} from "../primitives/Circle";
 import {Grid} from "./Grid";
-import {Point} from "./primitives/Point";
-import {Rectangle} from "./primitives/Rectangle";
-import {GraphicElement} from "./primitives/GraphicElement";
-import {Canvas} from "./Canvas";
-import {Listener} from "./listeners/Listener";
-import {Segment} from "./primitives/Segment";
-import {Config} from "./Config";
+import {Point} from "../primitives/Point";
+import {Rectangle} from "../primitives/Rectangle";
+import {GraphicElement} from "../primitives/GraphicElement";
+import {Canvas} from "../Canvas";
+import {Listener} from "../listeners/Listener";
+import {Segment} from "../primitives/Segment";
+import {Config} from "../Config";
 import {MovableCircle} from "./MovableCircle";
+import {Label} from "./Label";
 
 export class CircleKeeper implements GraphicElement {
     private static DefaultLayer = 0;
@@ -70,6 +71,14 @@ export class CircleKeeper implements GraphicElement {
             let rel = this.circleRectRelation[i];
             rel[0].draw(canvas);
         }
+
+        /*if (Config.CircleMap) {
+            let stats = this.statistics();
+
+            for (let stat of stats) {
+                new Label(stat[0], stat[1].toString()).draw(canvas);
+            }
+        }*/
     }
 
     updateIntersection(rects: Rectangle[], line: Segment) {
@@ -79,11 +88,11 @@ export class CircleKeeper implements GraphicElement {
             this.circleRectRelation[i][0].lineWidth = 1;
         }
 
-        if (Config.allCircleTraversal) {
+        if (Config.AllCircleTraversal) {
             for (let i = 0; i < this.circlesAmount; i++) {
                 let rects = this.circleRectRelation[i][1];
                 for (let rect of rects) {
-                    rect.fillStyle = Config.green;
+                    rect.fillStyle = Config.Green;
                 }
             }
         }
@@ -116,10 +125,9 @@ export class CircleKeeper implements GraphicElement {
                 for (let crect of cRects) {
                     if (rect.equals(crect)) {
                         circles.push(circle);
-                        if (Config.circleTraversal) {
+                        if (Config.CircleTraversal) {
                             for (let r of cRects) {
-                                //r.fillStyle = "rgba(76,175,80,0.7)"
-                                r.fillStyle = Config.green;
+                                r.fillStyle = Config.Green;
                             }
                         }
                         continue l;
@@ -145,5 +153,43 @@ export class CircleKeeper implements GraphicElement {
         }
 
         return listeners;
+    }
+
+    statistics(): [Rectangle, number][] {
+        let rects: Rectangle[] = [];
+
+        if (Config.AllCircleTraversal) {
+            for (let i = 0; i < this.circlesAmount; i++) {
+                let rel = this.circleRectRelation[i];
+                rects = rects.concat(rel[1]);
+            }
+        } else if (Config.CircleTraversal) {
+            // todo
+        }
+
+        rects = rects.sort((a, b) => a.compare(b));
+
+        let stats: [Rectangle, number][] = [];
+
+        for (let i = 0; i < rects.length; i++) {
+            let rect = rects.shift();
+            let rect2: Rectangle;
+            let count = 0;
+            do {
+                rect2 = rects.shift();
+                count++;
+            }
+            while (rect.equals(rect2));
+
+            if (rect2) {
+                rects.unshift(rect2);
+            }
+
+            stats.push([rect, count])
+        }
+
+        console.log(stats.length);
+
+        return stats;
     }
 }

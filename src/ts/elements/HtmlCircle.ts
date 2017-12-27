@@ -1,7 +1,7 @@
 import $ from "jquery";
-import {Circle} from "./primitives/Circle";
-import {Point} from "./primitives/Point";
-import {Canvas} from "./Canvas";
+import {Circle} from "../primitives/Circle";
+import {Point} from "../primitives/Point";
+import {Canvas} from "../Canvas";
 
 export class HtmlCircle extends Circle {
     private element : HTMLElement;

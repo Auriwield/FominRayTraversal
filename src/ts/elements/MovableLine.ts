@@ -1,12 +1,12 @@
-import {Segment} from "./primitives/Segment";
-import {Circle} from "./primitives/Circle";
-import {GraphicElement} from "./primitives/GraphicElement";
-import {Canvas} from "./Canvas";
-import {Listener} from "./listeners/Listener";
-import {Point} from "./primitives/Point";
-import {OnDragListener} from "./listeners/OnDragListener";
+import {Segment} from "../primitives/Segment";
+import {Circle} from "../primitives/Circle";
+import {GraphicElement} from "../primitives/GraphicElement";
+import {Canvas} from "../Canvas";
+import {Listener} from "../listeners/Listener";
+import {Point} from "../primitives/Point";
+import {OnDragListener} from "../listeners/OnDragListener";
 import {HtmlCircle} from "./HtmlCircle";
-import {Config} from "./Config";
+import {Config} from "../Config";
 
 export class MovableLine implements GraphicElement {
     private line: Segment;
@@ -19,7 +19,7 @@ export class MovableLine implements GraphicElement {
     layer = 0;
 
     constructor(canvas: Canvas) {
-        this.line = new Segment(new Point(100, 100), new Point(500, 500), 1, Config.black);
+        this.line = new Segment(new Point(100, 100), new Point(500, 500), 1, Config.Black);
         this.canvas = canvas;
         this.callbacks = [];
         this.edgeRadius = 24;

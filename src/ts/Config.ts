@@ -1,14 +1,15 @@
 
 let Config : any = {
-    "circleTraversal" : false,
-    "allCircleTraversal" : false,
-    "showGrid" : true,
-    "lineTraversal" : true,
-    "white" : "#ffffff",
-    "black" : "#212121",
-    "red" : "#F44336",
-    "green" : "#4CAF50",
-    "brown" : "#CA5D3C",
+    "CircleTraversal" : false,
+    "CircleMap" : true,
+    "AllCircleTraversal" : false,
+    "ShowGrid" : true,
+    "LineTraversal" : true,
+    "White" : "#ffffff",
+    "Black" : "#212121",
+    "Red" : "#F44336",
+    "Green" : "#4CAF50",
+    "Brown" : "#CA5D3C",
     "EPS" : 0.0000001,
     "LowEps" : 2
 };

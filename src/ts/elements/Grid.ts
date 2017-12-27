@@ -1,10 +1,10 @@
-import {Rectangle} from "./primitives/Rectangle";
-import {Point} from "./primitives/Point";
-import {GraphicElement} from "./primitives/GraphicElement";
-import {Canvas} from "./Canvas";
-import {Listener} from "./listeners/Listener";
-import {Segment} from "./primitives/Segment";
-import {Config} from "./Config";
+import {Rectangle} from "../primitives/Rectangle";
+import {Point} from "../primitives/Point";
+import {GraphicElement} from "../primitives/GraphicElement";
+import {Canvas} from "../Canvas";
+import {Listener} from "../listeners/Listener";
+import {Segment} from "../primitives/Segment";
+import {Config} from "../Config";
 
 export class Grid implements GraphicElement {
     // amount of cells in cols and rows
@@ -62,7 +62,7 @@ export class Grid implements GraphicElement {
                 rects.push(rect)
             }
 
-            rect.fillStyle = Config.lineTraversal && lineCrossesRect ? Config.red : Config.white
+            rect.fillStyle = Config.LineTraversal && lineCrossesRect ? Config.Red : Config.White
         }
 
         return rects;
@@ -73,7 +73,7 @@ export class Grid implements GraphicElement {
             rect.draw(canvas);
         }
 
-        if (!Config.showGrid) return;
+        if (!Config.ShowGrid) return;
 
         for (let line of this.lines) {
             line.draw(canvas);

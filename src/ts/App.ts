@@ -1,9 +1,9 @@
 import $ from "jquery";
 import {Canvas} from "./Canvas";
 import {Segment} from "./primitives/Segment";
-import {MovableLine} from "./MovableLine";
-import {Grid} from "./Grid";
-import {CircleKeeper} from "./CircleKeeper";
+import {MovableLine} from "./elements/MovableLine";
+import {Grid} from "./elements/Grid";
+import {CircleKeeper} from "./elements/CircleKeeper";
 import {Config} from "./Config";
 
 $(() => {
@@ -38,28 +38,28 @@ $(() => {
 
     $("#trace-circle-area").change((evt) => {
         let e = <any> evt;
-        Config.circleTraversal = e.target.checked;
+        Config.CircleTraversal = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });
 
     $("#trace-all-circle-area").change((evt) => {
         let e = <any> evt;
-        Config.allCircleTraversal = e.target.checked;
+        Config.AllCircleTraversal = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });
 
     $("#trace-line-area").click((evt) => {
         let e = <any> evt;
-        Config.lineTraversal = e.target.checked;
+        Config.LineTraversal = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });
 
     $("#show-grid").click((evt) => {
         let e = <any> evt;
-        Config.showGrid = e.target.checked;
+        Config.ShowGrid = e.target.checked;
         movableLine.callCallbacks();
         canvas.refresh();
     });

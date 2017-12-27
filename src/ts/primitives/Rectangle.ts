@@ -4,14 +4,14 @@ import {Canvas} from "../Canvas";
 import {Listener} from "../listeners/Listener";
 import {Segment} from "./Segment";
 import {Circle} from "./Circle";
+import {Config} from "../Config";
 
 export class Rectangle implements GraphicElement {
-    private origin: Point;
-    private width: number;
-    private height: number;
+    private _origin: Point;
+    private _width: number;
+    private _height: number;
     private _strokeStyle: string;
     private _fillStyle: string;
-
 
     layer = 0;
 
@@ -20,9 +20,9 @@ export class Rectangle implements GraphicElement {
                 height: number,
                 strokeColor = "#ffffff",
                 fillColor = "#ffffff") {
-        this.origin = origin;
-        this.width = width;
-        this.height = height;
+        this._origin = origin;
+        this._width = width;
+        this._height = height;
         this._strokeStyle = strokeColor;
         this._fillStyle = fillColor;
     }
@@ -98,13 +98,43 @@ export class Rectangle implements GraphicElement {
         return this._fillStyle;
     }
 
+    get origin(): Point {
+        return this._origin;
+    }
+
+    get width(): number {
+        return this._width;
+    }
+
+    get height(): number {
+        return this._height;
+    }
+
     set strokeStyle(value: string) {
         this._strokeStyle = value;
     }
 
-    equals(rect: Rectangle) {
+    equals(rect: Rectangle): boolean {
+        if (!rect) {
+            return false;
+        }
         return this.origin.equals(rect.origin)
-            && this.width == rect.width
-            && this.height == rect.height
+            && this.width - rect.width < Config.EPS
+            && this.height - rect.height < Config.EPS
+    }
+
+    compare(rect: Rectangle): number {
+        let x1 = this.origin.x;
+        let x2 = rect.origin.x;
+        let y1 = this.origin.y;
+        let y2 = rect.origin.y;
+
+        if (x1 === x2 && y1 === y2) {
+            return 0;
+        }
+
+        let sum = x1 - x2 + y1 - y2;
+
+        return sum > 0 ? -1 : +1;
     }
 }

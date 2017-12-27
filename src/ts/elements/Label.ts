@@ -13,6 +13,7 @@ export class Label implements GraphicElement {
     constructor(rect: Rectangle, num: string, textColor : string = "#000") {
         this.rect = rect;
         this.text = num;
+        this.textColor = textColor;
     }
 
     layer = -1;
@@ -23,7 +24,7 @@ export class Label implements GraphicElement {
         let rectY = this.rect.origin.y;
         let rectWidth = this.rect.width;
         let rectHeight = this.rect.height;
-        ctx.font="20px Georgia";
+        ctx.font= 10 * canvas.ratio + "px Georgia";
         ctx.textAlign="center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = this.textColor;

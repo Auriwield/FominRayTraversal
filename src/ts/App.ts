@@ -36,33 +36,22 @@ $(() => {
     canvas.addElement(movableLine);
     canvas.refresh();
 
-    $("#trace-circle-area").change((evt) => {
-        let e = <any> evt;
-        Config.CircleTraversal = e.target.checked;
-        movableLine.callCallbacks();
-        canvas.refresh();
-    });
+    let bindCheckbox = (id : string, configProp : string) => {
+        $(id)
+            .prop("checked", Config[configProp])
+            .change((evt) => {
+                let e = <any> evt;
+                Config[configProp] = e.target.checked;
+                movableLine.callCallbacks();
+                canvas.refresh();
+            });
+    };
 
-    $("#trace-all-circle-area").change((evt) => {
-        let e = <any> evt;
-        Config.AllCircleTraversal = e.target.checked;
-        movableLine.callCallbacks();
-        canvas.refresh();
-    });
-
-    $("#trace-line-area").click((evt) => {
-        let e = <any> evt;
-        Config.LineTraversal = e.target.checked;
-        movableLine.callCallbacks();
-        canvas.refresh();
-    });
-
-    $("#show-grid").click((evt) => {
-        let e = <any> evt;
-        Config.ShowGrid = e.target.checked;
-        movableLine.callCallbacks();
-        canvas.refresh();
-    });
+    bindCheckbox("#trace-circle-area", "CircleTraversal");
+    bindCheckbox("#trace-all-circle-area", "AllCircleTraversal");
+    bindCheckbox("#trace-line-area", "LineTraversal");
+    bindCheckbox("#show-grid", "ShowGrid");
+    bindCheckbox("#show-map", "ShowMap");
 
     $("#add-circle-button").click(() => {
         circleKeeper.addCircle();

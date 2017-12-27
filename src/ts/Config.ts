@@ -1,7 +1,7 @@
 
 let Config : any = {
     "CircleTraversal" : false,
-    "CircleMap" : true,
+    "ShowMap" : false,
     "AllCircleTraversal" : false,
     "ShowGrid" : true,
     "LineTraversal" : true,

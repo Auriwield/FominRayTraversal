@@ -15,6 +15,7 @@ export class CircleKeeper implements GraphicElement {
     private circleRectRelation: [Circle, Rectangle[]][];
     private grid: Grid;
     private circlesAmount: number = 0;
+    private lastIntersectedCircleAreas : Rectangle[] = [];
     onCircleMoved: () => void;
 
     layer = CircleKeeper.DefaultLayer;
@@ -67,18 +68,18 @@ export class CircleKeeper implements GraphicElement {
     }
 
     draw(canvas: Canvas): void {
+
+        if (Config.ShowMap) {
+            let stats = this.statistics();
+            for (let stat of stats) {
+                new Label(stat[0], stat[1].toString()).draw(canvas);
+            }
+        }
+
         for (let i = 0; i < this.circlesAmount; i++) {
             let rel = this.circleRectRelation[i];
             rel[0].draw(canvas);
         }
-
-        /*if (Config.CircleMap) {
-            let stats = this.statistics();
-
-            for (let stat of stats) {
-                new Label(stat[0], stat[1].toString()).draw(canvas);
-            }
-        }*/
     }
 
     updateIntersection(rects: Rectangle[], line: Segment) {
@@ -100,6 +101,12 @@ export class CircleKeeper implements GraphicElement {
         let circles = this.getCirclesByRects(rects);
         if (circles.length == 0) return;
 
+        if (Config.CircleTraversal) {
+            for (let r of this.lastIntersectedCircleAreas) {
+                r.fillStyle = Config.Green;
+            }
+        }
+
         for (let circle of circles) {
             let points = line.getIntersectionPoints(circle);
             if (points.length > 0) {
@@ -115,6 +122,7 @@ export class CircleKeeper implements GraphicElement {
 
     getCirclesByRects(rects: Rectangle[]): Circle[] {
         let circles: Circle[] = [];
+        let intRects : Rectangle[] = [];
 
         l:for (let i = 0; i < this.circlesAmount; i++) {
             let rel = this.circleRectRelation[i];
@@ -125,17 +133,14 @@ export class CircleKeeper implements GraphicElement {
                 for (let crect of cRects) {
                     if (rect.equals(crect)) {
                         circles.push(circle);
-                        if (Config.CircleTraversal) {
-                            for (let r of cRects) {
-                                r.fillStyle = Config.Green;
-                            }
-                        }
+                        intRects = intRects.concat(cRects);
                         continue l;
                     }
                 }
             }
         }
 
+        this.lastIntersectedCircleAreas = [].concat(intRects);
         return circles;
     }
 
@@ -164,14 +169,14 @@ export class CircleKeeper implements GraphicElement {
                 rects = rects.concat(rel[1]);
             }
         } else if (Config.CircleTraversal) {
-            // todo
+            rects = rects.concat(this.lastIntersectedCircleAreas);
         }
 
         rects = rects.sort((a, b) => a.compare(b));
 
         let stats: [Rectangle, number][] = [];
 
-        for (let i = 0; i < rects.length; i++) {
+        while (rects.length) {
             let rect = rects.shift();
             let rect2: Rectangle;
             let count = 0;
@@ -187,9 +192,6 @@ export class CircleKeeper implements GraphicElement {
 
             stats.push([rect, count])
         }
-
-        console.log(stats.length);
-
         return stats;
     }
 }

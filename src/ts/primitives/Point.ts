@@ -1,3 +1,5 @@
+import {Config} from "../Config";
+
 export class Point {
     private _x: number;
     private _y: number;
@@ -23,21 +25,23 @@ export class Point {
         this._y = value;
     }
 
-    equals(point : Point) : boolean {
-        return point != null
-            && this.x === point.x
-            && this.y === point.y;
+    equals(point: Point): boolean {
+        if (!point) return false;
+        let x = this.x - point.x;
+        let y = this.y - point.y;
+        return x > -Config.EPS && x < Config.EPS
+            && y > -Config.EPS && y < Config.EPS;
     }
 
     toString() {
         return "x: " + this.x + " y: " + this.y;
     }
 
-    delta(point: Point) : Point {
+    delta(point: Point): Point {
         return new Point(this.x - point.x, this.y - point.y);
     }
 
-    move(x : number, y : number, applyOnThis : boolean = false) : Point {
+    move(x: number, y: number, applyOnThis: boolean = false): Point {
         if (applyOnThis) {
             this.x += x;
             this.y += y;

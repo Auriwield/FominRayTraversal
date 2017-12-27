@@ -124,7 +124,7 @@ export class Segment implements GraphicElement {
 
         let dist = (nearestX - cx) ** 2 + (nearestY - cy) ** 2;
 
-        return dist <= r ** 2;
+        return dist <= r * r;
     }
 
     getIntersectionPoints(circle: Circle): Point[] {

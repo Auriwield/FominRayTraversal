@@ -156,7 +156,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     var grid = new _Grid.Grid(20, side, side);
     canvas.addElement(grid);
     var movableLine = new _MovableLine.MovableLine(canvas);
-    var circleKeeper = new _CircleKeeper.CircleKeeper(grid, 4);
+    var circleKeeper = new _CircleKeeper.CircleKeeper(grid, 1000);
     movableLine.addCallback(function (line) {
         var rects = grid.updateIntersection(line);
         circleKeeper.updateIntersection(rects, line);
@@ -1492,8 +1492,11 @@ Line.min = 999999999990;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Point = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Config = require("../Config");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1508,7 +1511,10 @@ var Point = exports.Point = function () {
     _createClass(Point, [{
         key: "equals",
         value: function equals(point) {
-            return point != null && this.x === point.x && this.y === point.y;
+            if (!point) return false;
+            var x = this.x - point.x;
+            var y = this.y - point.y;
+            return x > -_Config.Config.EPS && x < _Config.Config.EPS && y > -_Config.Config.EPS && y < _Config.Config.EPS;
         }
     }, {
         key: "toString",
@@ -1553,7 +1559,7 @@ var Point = exports.Point = function () {
     return Point;
 }();
 
-},{}],15:[function(require,module,exports){
+},{"../Config":2}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1795,7 +1801,7 @@ var Segment = exports.Segment = function () {
             var nearestX = ax + t * dx;
             var nearestY = ay + t * dy;
             var dist = Math.pow(nearestX - cx, 2) + Math.pow(nearestY - cy, 2);
-            return dist <= Math.pow(r, 2);
+            return dist <= r * r;
         }
     }, {
         key: "getIntersectionPoints",

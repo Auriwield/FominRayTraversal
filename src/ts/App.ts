@@ -22,7 +22,7 @@ $(() => {
     canvas.addElement(grid);
 
     let movableLine = new MovableLine(canvas);
-    let circleKeeper = new CircleKeeper(grid, 15);
+    let circleKeeper = new CircleKeeper(grid, 1000);
 
     movableLine.addCallback(
         (line: Segment) => {

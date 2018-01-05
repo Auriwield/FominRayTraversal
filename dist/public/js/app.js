@@ -741,20 +741,22 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var HtmlCircle = exports.HtmlCircle = function (_Circle) {
     _inherits(HtmlCircle, _Circle);
 
-    function HtmlCircle(center, radius) {
-        var fillStyle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "#000";
-        var strokeStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "#000";
-        var lineWidth = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 2;
+    function HtmlCircle(center, radius, ratio) {
+        var fillStyle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "#000";
+        var strokeStyle = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : "#000";
+        var lineWidth = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 2;
 
         _classCallCheck(this, HtmlCircle);
+
+        radius *= ratio;
 
         var _this = _possibleConstructorReturn(this, (HtmlCircle.__proto__ || Object.getPrototypeOf(HtmlCircle)).call(this, center, radius, fillStyle, strokeStyle, lineWidth));
 
         var element = (0, _jquery2.default)("<div></div>");
         _this.element = element[0];
         (0, _jquery2.default)("#canvas").parent().append(element);
-        _this.element.style.height = radius + "px";
-        _this.element.style.width = radius + "px";
+        _this.element.style.height = radius * 2 / ratio + "px";
+        _this.element.style.width = radius * 2 / ratio + "px";
         _this.element.classList.add("circle");
         _this.element.classList.add("unselectable");
         _this.element.style.borderWidth = lineWidth + "px";
@@ -767,8 +769,9 @@ var HtmlCircle = exports.HtmlCircle = function (_Circle) {
         key: "draw",
         value: function draw(canvas) {
             var c = (0, _jquery2.default)("#canvas")[0];
-            this.element.style.left = (this.center.x - this.radius) / canvas.ratio + c.offsetLeft + "px";
-            this.element.style.top = (this.center.y - this.radius) / canvas.ratio + c.offsetTop + "px";
+            var r = canvas.ratio;
+            this.element.style.left = (this.center.x - this.radius) / r + c.offsetLeft + "px";
+            this.element.style.top = (this.center.y - this.radius) / r + c.offsetTop + "px";
         }
     }]);
 
@@ -917,9 +920,9 @@ var MovableLine = exports.MovableLine = function () {
         this.line = new _Segment.Segment(new _Point.Point(100, 100), new _Point.Point(500, 500), 1, _Config.Config.Black);
         this.canvas = canvas;
         this.callbacks = [];
-        this.edgeRadius = 24;
-        this.leftEdge = new _HtmlCircle.HtmlCircle(this.line.left, this.edgeRadius, "#fff", "#212121");
-        this.rightEdge = new _HtmlCircle.HtmlCircle(this.line.right, this.edgeRadius, "#fff", "#212121");
+        this.edgeRadius = 12;
+        this.leftEdge = new _HtmlCircle.HtmlCircle(this.line.left, this.edgeRadius, canvas.ratio, "#fff", "#212121");
+        this.rightEdge = new _HtmlCircle.HtmlCircle(this.line.right, this.edgeRadius, canvas.ratio, "#fff", "#212121");
     }
 
     _createClass(MovableLine, [{
@@ -1321,6 +1324,7 @@ var Circle = exports.Circle = function () {
     }, {
         key: "intersectionPoints",
         value: function intersectionPoints(points) {
+            var r = window.devicePixelRatio;
             this._intersectionPoints = [];
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
@@ -1330,7 +1334,7 @@ var Circle = exports.Circle = function () {
                 for (var _iterator2 = points[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var p = _step2.value;
 
-                    var circle = new Circle(p, 6, _Config.Config.White, _Config.Config.Black, 1);
+                    var circle = new Circle(p, 4 + (r - 1) * 2, _Config.Config.White, _Config.Config.Black, 1);
                     this._intersectionPoints.push(circle);
                 }
             } catch (err) {

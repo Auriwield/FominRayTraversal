@@ -79,9 +79,10 @@ export class Circle implements GraphicElement {
     }
 
     intersectionPoints(points: Point[]) {
+        let r = window.devicePixelRatio;
         this._intersectionPoints = [];
         for (let p of points) {
-            let circle = new Circle(p, 6, Config.White, Config.Black, 1);
+            let circle = new Circle(p, 4 + (r - 1) * 2, Config.White, Config.Black, 1);
             this._intersectionPoints.push(circle);
         }
     }
@@ -99,7 +100,7 @@ export class Circle implements GraphicElement {
         this._lineWidth = value;
     }
 
-    getDefaultLayer() : number {
+    getDefaultLayer(): number {
         return 1;
     }
 }

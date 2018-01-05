@@ -4,7 +4,7 @@ import {Point} from "../primitives/Point";
 import {Canvas} from "../Canvas";
 
 export class HtmlCircle extends Circle {
-    private element : HTMLElement;
+    private element: HTMLElement;
 
     constructor(center: Point,
                 radius: number,
@@ -17,8 +17,8 @@ export class HtmlCircle extends Circle {
         this.element = element[0];
         $("#canvas").parent().append(element);
 
-        this.element.style.height = radius + "px";
-        this.element.style.width = radius + "px";
+        this.element.style.height = radius * 2 + "px";
+        this.element.style.width = radius * 2 + "px";
         this.element.classList.add("circle");
         this.element.classList.add("unselectable");
         this.element.style.borderWidth = lineWidth + "px";
@@ -28,7 +28,7 @@ export class HtmlCircle extends Circle {
 
     draw(canvas: Canvas): void {
         let c = $("#canvas")[0];
-        this.element.style.left = (this.center.x - this.radius ) / canvas.ratio + c.offsetLeft + "px";
+        this.element.style.left = (this.center.x - this.radius) / canvas.ratio + c.offsetLeft + "px";
         this.element.style.top = (this.center.y - this.radius) / canvas.ratio + c.offsetTop + "px";
     }
 }

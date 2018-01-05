@@ -3,7 +3,6 @@ import {Canvas} from "../Canvas";
 import {Point} from "./Point";
 import {Listener} from "../listeners/Listener";
 import {Circle} from "./Circle";
-import {Rectangle} from "./Rectangle";
 import {Line} from "./Line";
 import {Config} from "../Config";
 

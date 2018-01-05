@@ -22,7 +22,7 @@ export class MovableLine implements GraphicElement {
         this.line = new Segment(new Point(100, 100), new Point(500, 500), 1, Config.Black);
         this.canvas = canvas;
         this.callbacks = [];
-        this.edgeRadius = 24;
+        this.edgeRadius = 12;
         this.leftEdge = new HtmlCircle(this.line.left, this.edgeRadius, "#fff", "#212121");
         this.rightEdge = new HtmlCircle(this.line.right, this.edgeRadius, "#fff", "#212121");
     }
